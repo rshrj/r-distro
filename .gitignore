@@ -1,0 +1,48 @@
+# Build and controller state
+/work/
+/out/
+/logs/
+
+# Generated APT repositories
+/repo/
+/repo-pass1/
+/repo-pass2/
+
+# Signing material - never commit private keys
+/keys/
+*.gpg
+*.asc
+*.key
+
+# Generated analysis output
+/analysis/
+/manifests/pass2/
+/manifests/selfhost-boundary-arm64.txt
+
+# Ad-hoc working manifests
+/manifests/*-retry.txt
+
+# Generated tree listing
+/tree.txt
+
+# Backups
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Temporary
+*.tmp
+*.swp
+*~
