@@ -1,0 +1,1101 @@
+<title>R-Distro Artifact Provenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --ground:      #F5F6F8;
+  --surface:     #FFFFFF;
+  --surface-2:   #ECEFF2;
+  --ink:         #14171C;
+  --ink-2:       #3B424C;
+  --muted:       #5C6673;
+  --faint:       #8A93A0;
+  --rule:        #DCE0E6;
+  --rule-strong: #C3C9D2;
+  --accent:      #A0472A;
+  --accent-soft: #F2E3DD;
+  --script:      #2C6A4C;
+  --script-soft: #DFECE5;
+  --manual:      #8A6212;
+  --manual-soft: #F1E8D4;
+  --stranded:    #6B5370;
+  --stranded-soft:#EBE3EC;
+
+  --f-display: "Spectral", "Iowan Old Style", Georgia, serif;
+  --f-body:    "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --measure: 70ch;
+  --rail: 250px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0E1115;
+    --surface:     #15191F;
+    --surface-2:   #1C222A;
+    --ink:         #E5E9EE;
+    --ink-2:       #C0C7D0;
+    --muted:       #949DAA;
+    --faint:       #6E7885;
+    --rule:        #262D36;
+    --rule-strong: #39414C;
+    --accent:      #DE8462;
+    --accent-soft: #35211A;
+    --script:      #63B58E;
+    --script-soft: #16281F;
+    --manual:      #D4A44E;
+    --manual-soft: #2B2314;
+    --stranded:    #B292B6;
+    --stranded-soft:#251D27;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #0E1115;
+  --surface:     #15191F;
+  --surface-2:   #1C222A;
+  --ink:         #E5E9EE;
+  --ink-2:       #C0C7D0;
+  --muted:       #949DAA;
+  --faint:       #6E7885;
+  --rule:        #262D36;
+  --rule-strong: #39414C;
+  --accent:      #DE8462;
+  --accent-soft: #35211A;
+  --script:      #63B58E;
+  --script-soft: #16281F;
+  --manual:      #D4A44E;
+  --manual-soft: #2B2314;
+  --stranded:    #B292B6;
+  --stranded-soft:#251D27;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 28px 96px;
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  gap: 52px;
+  align-items: start;
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  grid-column: 1 / -1;
+  padding: 68px 0 34px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+
+h1 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(2.3rem, 5.2vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0 0 20px;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+
+.standfirst {
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 62ch;
+  margin: 0;
+}
+
+.masthead-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  margin-top: 28px;
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.masthead-meta b {
+  color: var(--ink);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- table of contents rail ---------- */
+
+.rail {
+  position: sticky;
+  top: 28px;
+  align-self: start;
+  padding-top: 44px;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.rail h2 {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 14px;
+}
+
+.rail ol {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rail a {
+  display: block;
+  padding: 5px 10px 5px 12px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid var(--rule);
+  border-radius: 0 3px 3px 0;
+}
+.rail a:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-left-color: var(--accent);
+}
+.rail a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.rail a .n {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-right: 7px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- main column ---------- */
+
+main { padding-top: 44px; min-width: 0; }
+
+section { margin-bottom: 62px; scroll-margin-top: 24px; }
+
+h2.sec {
+  font-family: var(--f-display);
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+h2.sec .stage-n {
+  font-family: var(--f-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  flex: none;
+}
+
+h3 {
+  font-family: var(--f-body);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 36px 0 10px;
+  color: var(--ink);
+}
+h3 code { font-size: 0.95em; }
+
+p { max-width: var(--measure); margin: 0 0 15px; }
+p.lede { color: var(--ink-2); font-size: 1.03rem; }
+
+ul, ol.body { max-width: var(--measure); padding-left: 20px; margin: 0 0 15px; }
+li { margin-bottom: 7px; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+code {
+  font-family: var(--f-mono);
+  font-size: 0.855em;
+  background: var(--surface-2);
+  padding: 0.12em 0.36em;
+  border-radius: 3px;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+pre {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  line-height: 1.62;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 0 0 18px;
+}
+pre code { background: none; padding: 0; font-size: inherit; word-break: normal; }
+pre .cm { color: var(--faint); }
+
+/* ---------- provenance badges ---------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2.5px 8px;
+  border-radius: 3px;
+  vertical-align: 1.5px;
+  white-space: nowrap;
+}
+.b-script   { color: var(--script);   background: var(--script-soft); }
+.b-manual   { color: var(--manual);   background: var(--manual-soft); }
+.b-stranded { color: var(--stranded); background: var(--stranded-soft); }
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0 0 22px;
+}
+.legend > div { background: var(--surface); padding: 15px 17px; }
+.legend p { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); max-width: none; }
+
+/* ---------- tables ---------- */
+
+.tw { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--rule); border-radius: 5px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.8px; }
+th, td {
+  text-align: left;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  line-height: 1.5;
+}
+th {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td code { font-size: 0.9em; background: none; padding: 0; color: var(--ink-2); }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+/* ---------- callout ---------- */
+
+.note {
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 14px 18px;
+  border-radius: 0 4px 4px 0;
+  margin: 0 0 20px;
+  max-width: var(--measure);
+}
+.note p { margin: 0; font-size: 14.5px; max-width: none; }
+.note p + p { margin-top: 9px; }
+.note strong { color: var(--accent); }
+
+/* ---------- figure ---------- */
+
+figure {
+  margin: 0 0 26px;
+  padding: 26px 24px 18px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+figure svg { display: block; max-width: 100%; height: auto; margin: 0 auto; color: var(--ink-2); }
+figcaption {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ---------- stranded list ---------- */
+
+.stranded-item {
+  border-top: 1px solid var(--rule);
+  padding: 20px 0 4px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0 16px;
+}
+.stranded-item .idx {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--stranded);
+  font-variant-numeric: tabular-nums;
+  padding-top: 4px;
+}
+.stranded-item h4 {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+  line-height: 1.45;
+  word-break: break-word;
+}
+.stranded-item p { font-size: 14.5px; margin-bottom: 10px; }
+
+/* ---------- stat grid ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0 0 22px;
+}
+.stat { background: var(--surface); padding: 15px 16px; }
+.stat .k {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 6px;
+}
+.stat .v {
+  font-family: var(--f-mono);
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.stat .v.ok { color: var(--script); }
+.stat .v.warn { color: var(--manual); }
+.stat .v.dim { color: var(--muted); }
+
+footer {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 22px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+footer p { max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .rail { position: static; max-height: none; padding-top: 34px; border-bottom: 1px solid var(--rule); padding-bottom: 18px; }
+  .rail ol { flex-flow: row wrap; gap: 4px 6px; margin-bottom: 12px; }
+  .rail a { border-left: none; border: 1px solid var(--rule); border-radius: 4px; padding: 4px 10px; }
+  .masthead { padding-top: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <p class="eyebrow">R-Distro · Reference</p>
+    <h1>Artifact Provenance</h1>
+    <p class="standfirst">Every file in this tree is either tracked source or generated output. This walks each generated artifact back to the exact command that produced it — and names the twenty that no current script can produce any more.</p>
+    <div class="masthead-meta">
+      <span>Tracked source <b>27 files · 350 KB</b></span>
+      <span>Generated <b>~31 GB</b></span>
+      <span>Snapshot <b>20260813T165000Z</b></span>
+      <span>Architecture <b>arm64</b></span>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="Contents">
+    <h2>Pipeline</h2>
+    <ol>
+      <li><a href="#reading"><span class="n">—</span>How to read this</a></li>
+      <li><a href="#loop"><span class="n">—</span>The generation loop</a></li>
+      <li><a href="#s1"><span class="n">1</span>Container images</a></li>
+      <li><a href="#s2"><span class="n">2</span>Signing key</a></li>
+      <li><a href="#s3"><span class="n">3</span>Building packages</a></li>
+      <li><a href="#s4"><span class="n">4</span>Development archive</a></li>
+      <li><a href="#s5"><span class="n">5</span>Dependency analysis</a></li>
+      <li><a href="#s6"><span class="n">6</span>Self-hosting boundary</a></li>
+      <li><a href="#s7"><span class="n">7</span>Campaigns</a></li>
+      <li><a href="#s8"><span class="n">8</span>Releases</a></li>
+    </ol>
+    <h2>Reference</h2>
+    <ol>
+      <li><a href="#runbook"><span class="n">—</span>From-scratch runbook</a></li>
+      <li><a href="#stranded"><span class="n">—</span>Stranded artifacts</a></li>
+      <li><a href="#schema"><span class="n">—</span>Database schema</a></li>
+      <li><a href="#state"><span class="n">—</span>Current state</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="reading">
+      <h2 class="sec">How to read this</h2>
+      <p class="lede">Git holds only source, configuration, policy, documentation and frozen input definitions. Everything else is produced by running the tracked scripts — and this document is the map from output back to command.</p>
+      <p>Every artifact carries one of three provenance markers.</p>
+      <div class="legend">
+        <div>
+          <span class="badge b-script">Script</span>
+          <p>Produced by a tracked script. Re-running regenerates it.</p>
+        </div>
+        <div>
+          <span class="badge b-manual">Manual</span>
+          <p>Produced by a command a human ran directly. Reproducible — but only if you know the command, so it is written down here.</p>
+        </div>
+        <div>
+          <span class="badge b-stranded">Stranded</span>
+          <p>On disk, but no current script produces it. Re-running today will <em>not</em> recreate it.</p>
+        </div>
+      </div>
+      <p>Generation <em>N</em> stamps every package it builds with a <code>+rdistroN</code> version suffix. All paths are relative to the repository root.</p>
+    </section>
+
+    <section id="loop">
+      <h2 class="sec">The generation loop</h2>
+      <p>The linear pipeline runs pinned inputs → build → publish → analyze → boundary → campaign → promote. But the mechanism that makes R-Distro more than a rebuild script is the cycle at its end: each generation is promoted to an immutable signed archive, and the generation after it builds against that archive instead of against Debian.</p>
+
+      <figure>
+        <svg viewBox="0 0 760 400" role="img" aria-label="A four-stage cycle: build-package.sh writes attempt artifacts, which are validated and staged into repo/staging, promoted by atomic rename into repo/releases, which the next generation then builds against when USE_RDISTRO equals 1.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+            </marker>
+            <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#C4623C"></path>
+            </marker>
+          </defs>
+
+          <rect x="60" y="40" width="200" height="64" rx="4" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
+          <text x="160" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" font-weight="500" fill="currentColor">build-package.sh</text>
+          <text x="160" y="85" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">rebuild one source package</text>
+
+          <rect x="500" y="40" width="200" height="64" rx="4" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
+          <text x="600" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" font-weight="500" fill="currentColor">attempt-NNNN/</text>
+          <text x="600" y="85" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">immutable, never overwritten</text>
+
+          <rect x="500" y="280" width="200" height="64" rx="4" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
+          <text x="600" y="306" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" font-weight="500" fill="currentColor">repo/staging/</text>
+          <text x="600" y="325" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">indices built, Release signed</text>
+
+          <rect x="60" y="280" width="200" height="64" rx="4" fill="none" stroke="#C4623C" stroke-width="1.5"></rect>
+          <text x="160" y="306" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" font-weight="500" fill="#C4623C">repo/releases/</text>
+          <text x="160" y="325" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#C4623C">immutable generation N</text>
+
+          <line x1="260" y1="72" x2="490" y2="72" stroke="currentColor" stroke-width="1.25" marker-end="url(#ar)"></line>
+          <text x="375" y="60" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">writes to RDISTRO_OUTPUT_DIR</text>
+
+          <line x1="600" y1="104" x2="600" y2="270" stroke="currentColor" stroke-width="1.25" marker-end="url(#ar)"></line>
+          <text x="614" y="180" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">validate</text>
+          <text x="614" y="196" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">+ stage</text>
+
+          <line x1="500" y1="312" x2="270" y2="312" stroke="currentColor" stroke-width="1.25" marker-end="url(#ar)"></line>
+          <text x="385" y="300" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">promote — atomic rename</text>
+
+          <line x1="160" y1="280" x2="160" y2="114" stroke="#C4623C" stroke-width="1.5" marker-end="url(#ar-a)"></line>
+          <text x="146" y="180" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#C4623C" font-weight="500">USE_RDISTRO=1</text>
+          <text x="146" y="196" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#C4623C">generation N+1</text>
+        </svg>
+        <figcaption>The cycle that defines a generation. The rust arrow is the one that matters: without it, R-Distro is a rebuild script; with it, generation <em>N+1</em> is built from generation <em>N</em>&rsquo;s own binaries. Self-hosting is the state where that arrow carries <em>every</em> build dependency.</figcaption>
+      </figure>
+    </section>
+
+    <section id="s1">
+      <h2 class="sec"><span class="stage-n">01</span>Container images</h2>
+      <p><span class="badge b-manual">Manual</span> &nbsp;No tracked script builds the images; they are built by hand from the tracked Dockerfiles.</p>
+      <pre><code>docker build -t r-distro-builder:2026-08-13     builder/
+docker build -t rdistro-buildroot:2026-08-13    buildroot/
+docker build -t rdistro-controller:2026-08-13   controller/</code></pre>
+      <div class="tw"><table>
+        <thead><tr><th>Image</th><th>Built from</th><th>Used by</th></tr></thead>
+        <tbody>
+          <tr><td><code>r-distro-builder:2026-08-13</code></td><td><code>builder/Dockerfile</code></td><td><code>publish.sh</code></td></tr>
+          <tr><td><code>rdistro-buildroot:2026-08-13</code></td><td><code>buildroot/Dockerfile</code></td><td><code>build-package.sh</code>, <code>rdistro_repo.py stage</code></td></tr>
+          <tr><td><code>rdistro-controller:2026-08-13</code></td><td><code>controller/Dockerfile</code></td><td><code>publish-all.sh</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>The tag <code>2026-08-13</code> is hardcoded in all four consumers. <code>buildroot/Dockerfile</code> accepts <code>--build-arg BASE_IMAGE=…</code> so a later generation can be built inside an R-Distro base rather than the Debian one; the other two pin Debian directly. All three disable <code>Check-Valid-Until</code>, so the pinned snapshot keeps resolving rather than expiring partway through a multi-day campaign.</p>
+    </section>
+
+    <section id="s2">
+      <h2 class="sec"><span class="stage-n">02</span>Signing key</h2>
+      <p><span class="badge b-manual">Manual</span> &nbsp;Generated once into a repository-local GNUPGHOME.</p>
+      <pre><code>GNUPGHOME=keys/gnupg gpg --gen-key            <span class="cm"># identity: archive@rdistro.local</span>
+GNUPGHOME=keys/gnupg gpg --armor --export archive@rdistro.local \
+    &gt; repo/keys/rdistro-archive.asc</code></pre>
+      <div class="tw"><table>
+        <thead><tr><th>Artifact</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>keys/gnupg/pubring.kbx</code>, <code>trustdb.gpg</code>, <code>private-keys-v1.d/</code>, <code>openpgp-revocs.d/</code></td><td><strong>Private key material. Never committed.</strong></td></tr>
+          <tr><td><code>keys/gnupg/S.gpg-agent*</code></td><td>Agent sockets — transient, and deliberately not copied into containers</td></tr>
+          <tr><td><code>repo/keys/rdistro-archive.asc</code></td><td>Public key export, mounted into every build</td></tr>
+        </tbody>
+      </table></div>
+      <p>The key in this tree has fingerprint <code>F0590CEF4051A2E570640F886FE07B0A34055EFB</code>. Anyone reproducing R-Distro should generate their own — a release is only as trustworthy as the key that signed it.</p>
+      <div class="note"><p><strong>The public key is a hard prerequisite for every build.</strong> <code>build-package.sh</code> mounts <code>repo/keys/rdistro-archive.asc</code> unconditionally, even when <code>USE_RDISTRO=0</code>. If it is missing, Docker fails with an unhelpful mount error before the build starts.</p></div>
+    </section>
+
+    <section id="s3">
+      <h2 class="sec"><span class="stage-n">03</span>Building packages</h2>
+
+      <h3><code>scripts/build-package.sh &lt;pkg&gt; [rev]</code></h3>
+      <p>Rebuilds one Debian source package inside <code>rdistro-buildroot:2026-08-13</code>: <code>apt-get source</code> → <code>dch</code> to <code>+rdistro&lt;rev&gt;</code> → <code>mk-build-deps</code> → <code>dpkg-buildpackage</code>.</p>
+      <p><span class="badge b-script">Script</span> &nbsp;Output lands in <code>work/builds/&lt;pkg&gt;/</code> — or <code>$RDISTRO_OUTPUT_DIR</code> — which is wiped with <code>rm -rf "$OUT"/*</code> at the start of every run.</p>
+      <div class="tw"><table>
+        <thead><tr><th>File</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;src&gt;_&lt;ver&gt;+rdistro&lt;rev&gt;.dsc</code></td><td>Source control file</td></tr>
+          <tr><td><code>&lt;src&gt;_&lt;ver&gt;.orig.tar.*</code></td><td>Upstream tarball, copied from the <code>.dsc</code> file list</td></tr>
+          <tr><td><code>&lt;src&gt;_&lt;ver&gt;+rdistro&lt;rev&gt;.debian.tar.*</code> / <code>.diff.gz</code></td><td>Debian packaging delta</td></tr>
+          <tr><td><code>&lt;bin&gt;_&lt;ver&gt;+rdistro&lt;rev&gt;_arm64.deb</code></td><td>Binary packages, one or more</td></tr>
+          <tr><td><code>&lt;bin&gt;-dbgsym_…_arm64.deb</code></td><td>Debug symbols</td></tr>
+          <tr><td><code>&lt;src&gt;_…_arm64.buildinfo</code></td><td><strong>Records <code>Installed-Build-Depends</code> — the provenance evidence</strong></td></tr>
+          <tr><td><code>&lt;src&gt;_…_arm64.changes</code></td><td>Upload control file</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="tw"><table>
+        <thead><tr><th>Variable</th><th>Default</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>USE_RDISTRO</code></td><td><code>0</code></td><td><code>1</code> adds the R-Distro archive at <code>http://host.docker.internal:8080/</code> and upgrades installed packages to their <code>+rdistro</code> versions before building</td></tr>
+          <tr><td><code>BUILD_JOBS</code></td><td><code>4</code></td><td><code>dpkg-buildpackage -j</code></td></tr>
+          <tr><td><code>RDISTRO_OUTPUT_DIR</code></td><td><code>work/builds/&lt;pkg&gt;</code></td><td>Output path; the controller sets this per attempt</td></tr>
+          <tr><td><code>DEB_BUILD_OPTIONS</code> / <code>DEB_BUILD_PROFILES</code></td><td><code>nocheck nodoc</code></td><td>Overridden per package by policy</td></tr>
+          <tr><td><code>PRE_BUILD_COMMAND</code></td><td><em>empty</em></td><td>Shell hook run in the source tree before the build</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>Package-specific exceptions live in <code>config/package-policy/&lt;pkg&gt;.env</code>, sourced automatically. Two exist today: <code>bash.env</code> drops <code>nodoc</code>, because the bash build needs its documentation targets; <code>linux.env</code> sets a <code>PRE_BUILD_COMMAND</code> that regenerates <code>debian/control-real</code> before <code>Build-Depends</code> can be read. After any hook runs, the script sweeps <code>__pycache__</code> directories and <code>*.pyc</code> files from the source tree, so a preparation step cannot contaminate the source package.</p>
+
+      <h3><code>scripts/build-base.sh [rev]</code></h3>
+      <p>Drives <code>build-package.sh</code> in parallel across <code>manifests/base-sources.txt</code> — 49 sources. Superseded by <code>rdistroctl.py</code> for anything larger.</p>
+      <p><span class="badge b-script">Script</span> &nbsp;Writes <code>logs/pass&lt;rev&gt;/&lt;pkg&gt;.log</code> per manifest entry, plus <code>logs/pass&lt;rev&gt;/succeeded</code> and <code>logs/pass&lt;rev&gt;/failed</code>.</p>
+      <pre><code>PARALLEL=2 BUILD_JOBS=4 scripts/build-base.sh 1</code></pre>
+    </section>
+
+    <section id="s4">
+      <h2 class="sec"><span class="stage-n">04</span>The development archive</h2>
+
+      <h3><code>scripts/publish-all.sh</code></h3>
+      <p>Rebuilds the whole development pool from <code>work/builds</code>, generates APT indices, and signs <code>Release</code>. It refuses to run if a source directory holds more than one <code>+rdistro*.dsc</code>, copies exactly the files that <code>.dsc</code> references, and publishes only locally-versioned binaries — so a stale artifact from an earlier pass cannot leak into the archive.</p>
+      <p><span class="badge b-script">Script</span></p>
+      <div class="tw"><table>
+        <thead><tr><th>Artifact</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>repo/pool/main/r/rdistro/*</code></td><td><strong>Flat</strong> pool: every <code>.deb</code>, <code>.dsc</code>, <code>.orig.tar.*</code>, <code>.debian.tar.*</code></td></tr>
+          <tr><td><code>repo/dists/development/main/binary-arm64/Packages{,.gz}</code></td><td>Binary index</td></tr>
+          <tr><td><code>repo/dists/development/main/source/Sources{,.gz}</code></td><td>Source index</td></tr>
+          <tr><td><code>repo/dists/development/Release</code></td><td><code>Origin</code>/<code>Label</code> <code>R-Distro</code>, <code>Suite</code>/<code>Codename</code> <code>development</code></td></tr>
+          <tr><td><code>repo/dists/development/InRelease</code></td><td>Inline-signed <code>Release</code></td></tr>
+          <tr><td><code>repo/dists/development/Release.gpg</code></td><td>Detached signature</td></tr>
+        </tbody>
+      </table></div>
+      <p><code>pool/main/r/rdistro</code> is <code>rm -rf</code>&rsquo;d and rebuilt on every run, and <code>apt-ftparchive</code> is scoped to that same path. Nothing else under <code>repo/</code> is touched — see <a href="#st12">stranded artifact 12</a>.</p>
+
+      <h3><code>scripts/publish.sh &lt;pkg&gt;</code></h3>
+      <p>Single-package variant using <code>r-distro-builder:2026-08-13</code>. Appends to the pool without wiping it, and scopes <code>apt-ftparchive</code> to the whole of <code>pool/main</code> rather than the R-Distro subtree. Useful during iteration; <code>publish-all.sh</code> is the authoritative path.</p>
+
+      <h3>Serving the archive</h3>
+      <p><span class="badge b-manual">Manual</span> &nbsp;— and required. <code>USE_RDISTRO=1</code> builds fetch from <code>http://host.docker.internal:8080/</code>, but no tracked script starts that server.</p>
+      <pre><code>cd repo &amp;&amp; nohup python3 -m http.server 8080 \
+    &gt; ../work/services/repo-server.log 2&gt;&amp;1 &amp;
+echo $! &gt; ../work/services/repo-server.pid</code></pre>
+      <div class="note">
+        <p><strong>This is the largest reproducibility gap in the project.</strong> Every generation-<em>N</em> build silently depends on this server being up.</p>
+        <p>If it is down, <code>apt</code> simply falls back to Debian binaries and the build still <em>succeeds</em> — quietly producing a package with the wrong provenance. Nothing checks for it, including <code>rdistroctl.py doctor</code>.</p>
+      </div>
+      <p><code>work/services/dashboard.{log,pid}</code> comes from the same pattern: a nohup&rsquo;d <code>rdistroctl.py dashboard</code>.</p>
+    </section>
+
+    <section id="s5">
+      <h2 class="sec"><span class="stage-n">05</span>Dependency analysis</h2>
+      <p class="lede">Four scripts write into <code>analysis/</code>. All of it is regenerable; none of it is committed.</p>
+
+      <h3><code>scripts/analyze-deps.py</code></h3>
+      <p>Reads the <code>.buildinfo</code> and <code>.dsc</code> files under <code>work/builds/</code> plus <code>manifests/base-sources.txt</code>, and records what was <em>actually</em> installed to satisfy each build versus what was declared.</p>
+      <div class="note"><p><strong>Hardwired to generation 2.</strong> The script globs <code>*+rdistro2.dsc</code> and warns for any source where exactly one is not found. It cannot analyze a gen-1 or gen-3 build tree without editing — the directory name <code>analysis/pass2/</code> is load-bearing, not descriptive.</p></div>
+      <p><span class="badge b-script">Script</span> &nbsp;<code>analysis/pass2/</code>, 12 files:</p>
+      <div class="tw"><table>
+        <thead><tr><th>File</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>installed-build-deps.csv</code></td><td>Every binary installed for every build, from <code>Installed-Build-Depends</code></td></tr>
+          <tr><td><code>debian-fallback-ranking.csv</code></td><td>Which Debian binaries the base still falls back to, by frequency</td></tr>
+          <tr><td><code>top-fallback-binaries.txt</code>, <code>top-fallback-sources.csv</code></td><td>The worst offenders, condensed</td></tr>
+          <tr><td><code>package-summary.csv</code></td><td>Per-source rollup</td></tr>
+          <tr><td><code>declared-base{,-edges}.csv</code> / <code>.dot</code> / <code>.svg</code></td><td>Declared <code>Build-Depends</code> graph within the base</td></tr>
+          <tr><td><code>gen1-to-gen2{,-edges}.csv</code> / <code>.dot</code> / <code>.svg</code></td><td>Observed generation-crossing edges</td></tr>
+          <tr><td><code>dependency-data.json</code></td><td>Machine-readable dump of the whole analysis</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3><code>scripts/analyze-bootstrap-closure.py</code></h3>
+      <p>Closure from <em>observed</em> build dependencies (<code>analysis/pass2/installed-build-deps.csv</code>) plus the base and frontier manifests. Refuses to run if those two manifests overlap.</p>
+      <pre><code>scripts/analyze-bootstrap-closure.py --refresh
+scripts/analyze-bootstrap-closure.py --mode bootstrap --profile nocheck</code></pre>
+      <p><span class="badge b-script">Script</span> &nbsp;<code>analysis/bootstrap/reduced/</code> — <code>nodes.csv</code>, <code>edges.csv</code>, <code>external-sources.csv</code>, <code>strongly-connected-components.csv</code>, <code>build-levels.csv</code>, <code>unresolved-dependencies.csv</code>, <code>dependency-data.json</code>, <code>summary.md</code>, and <code>bootstrap-{core,with-external,scc}.{dot,svg}</code>. <code>--refresh</code> populates <code>reduced/cache/</code>.</p>
+      <div class="note"><p><strong><code>--mode</code> does not change the output directory.</strong> <code>OUT</code> is hardcoded to <code>reduced/</code> at <code>analyze-bootstrap-closure.py:22</code>, so both modes overwrite the same path. Use <code>--no-render</code> to skip Graphviz.</p></div>
+
+      <h3><code>scripts/analyze-bootstrap-recursive.py</code></h3>
+      <p>Closure from <em>declared</em> metadata over the full snapshot universe — the independent cross-check on the observation-based closure above.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Invocation</th><th>Output directory</th></tr></thead>
+        <tbody>
+          <tr><td><code>--mode bootstrap</code> (default, profiles <code>nocheck nodoc</code>)</td><td><code>analysis/bootstrap/recursive/</code></td></tr>
+          <tr><td><code>--mode full</code> (no profiles)</td><td><code>analysis/bootstrap/recursive-full/</code></td></tr>
+          <tr><td><code>--refresh</code> (either mode)</td><td><code>analysis/bootstrap/universe-cache/</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Each output directory holds <code>nodes.csv</code>, <code>edges.csv</code>, <code>condensation-edges.csv</code>, <code>build-levels.csv</code>, <code>discovery-layers.csv</code>, <code>strongly-connected-components.csv</code>, <code>unresolved-{dependencies,sources}.csv</code>, <code>dependency-data.json</code>, <code>summary.md</code>, <code>bootstrap-{closure,scc}.{dot,svg}</code>, and <code>discovery-manifests/depth-NN.txt</code> — one file per BFS layer, which is what makes the expansion auditable step by step.</p>
+      <p><code>--max-depth N</code> truncates the walk. <code>universe-cache/sources.raw</code> is 62 MB against <code>reduced/cache/sources.raw</code>&rsquo;s 2 MB, because this script fetches the entire archive rather than a filtered slice.</p>
+
+      <h3><code>scripts/filter-botch-universe.py</code> and the botch wrappers</h3>
+      <p>Narrows the snapshot universe to the R-Distro closure so <code>botch</code> can ingest it, reading <code>recursive-full/nodes.csv</code> and <code>universe-cache/*.raw</code>.</p>
+      <p><span class="badge b-script">Script</span> &nbsp;<code>analysis/bootstrap/botch-rdistro/Sources</code> and <code>Packages</code> — only these two files.</p>
+      <p><code>botch-bin2src-safe.py</code> and <code>botch-src2bin-safe.py</code> are stdin/stdout deb822 normalizers that keep botch from choking on malformed or ambiguous stanzas. They write no files of their own.</p>
+    </section>
+
+    <section id="s6">
+      <h2 class="sec"><span class="stage-n">06</span>The self-hosting boundary</h2>
+      <p class="lede">The load-bearing analysis: which packages must R-Distro be able to build for the ARM64 base to be self-hosting?</p>
+      <p>Starting from <code>manifests/base-sources.txt</code>, <code>scripts/analyze-selfhost-boundary.py</code> expands <code>required</code> / <code>important</code> / <code>essential</code> / <code>build-essential</code> binaries together with <code>Build-Depends</code>, <code>Build-Depends-Arch</code>, <code>Pre-Depends</code> and <code>Depends</code>, under the <code>nocheck nodoc</code> profiles, and recurses until a full round discovers nothing new.</p>
+      <p>It is a fixed point, not a truncated walk — the same snapshot always yields the same answer. <code>Build-Depends-Indep</code>, <code>Recommends</code>, <code>Suggests</code>, other architectures and Debian&rsquo;s cross-toolchain packages are excluded deliberately: none are needed to rebuild the ARM64 base.</p>
+
+      <div class="stats">
+        <div class="stat"><p class="k">Sources</p><p class="v">4725</p></div>
+        <div class="stat"><p class="k">Binaries</p><p class="v">7570</p></div>
+        <div class="stat"><p class="k">Rounds</p><p class="v">14</p></div>
+        <div class="stat"><p class="k">Unresolved</p><p class="v ok">0</p></div>
+        <div class="stat"><p class="k">Ambiguous</p><p class="v warn">187</p></div>
+        <div class="stat"><p class="k">Status</p><p class="v ok">VALID</p></div>
+      </div>
+
+      <p><span class="badge b-script">Script</span> &nbsp;<code>analysis/selfhost-boundary/</code>, 16 files:</p>
+      <div class="tw"><table>
+        <thead><tr><th>File</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>BOUNDARY.md</code></td><td>The narrative result: definition, inclusion rules, findings</td></tr>
+          <tr><td><code>summary.json</code></td><td>Machine-readable result, including SHA-256 of both <code>.raw</code> inputs</td></tr>
+          <tr><td><code>boundary-source-names.txt</code></td><td><strong>4725 source names — the campaign manifest</strong></td></tr>
+          <tr><td><code>boundary-sources.txt</code>, <code>boundary-binaries.txt</code></td><td>The same, with versions and architectures</td></tr>
+          <tr><td><code>sources.csv</code>, <code>binaries.csv</code></td><td>Full metadata for every package considered</td></tr>
+          <tr><td><code>build-edges.csv</code>, <code>runtime-edges.csv</code></td><td>The two dependency relations, kept separate</td></tr>
+          <tr><td><code>seeds.csv</code></td><td>Why each seed entered the closure</td></tr>
+          <tr><td><code>source-sccs.csv</code>, <code>boundary-scc.{dot,svg}</code></td><td>Strongly connected components, condensed</td></tr>
+          <tr><td><code>ambiguous-virtuals.csv</code></td><td>Every virtual package with more than one provider</td></tr>
+          <tr><td><code>source-version-mismatches.csv</code></td><td>Binaries whose source version disagrees</td></tr>
+          <tr><td><code>unresolved.csv</code></td><td>Relations that could not be resolved</td></tr>
+        </tbody>
+      </table></div>
+      <p>187 ambiguous virtual choices are reported rather than silently resolved. The SCC condensation is rendered; the full 4711-node graph deliberately is not.</p>
+
+      <h3>Promoting the result</h3>
+      <p><span class="badge b-manual">Manual</span> &nbsp;The two files under <code>manifests/</code> are hand-copied from the analysis output. Both are byte-identical to their sources.</p>
+      <pre><code>cp analysis/selfhost-boundary/BOUNDARY.md \
+   manifests/selfhost-boundary-arm64.md
+cp analysis/selfhost-boundary/boundary-source-names.txt \
+   manifests/selfhost-boundary-arm64.txt</code></pre>
+      <p>The <code>.md</code> is <strong>tracked</strong> — it is the headline finding. The <code>.txt</code> is <strong>not</strong>, but the <code>gen3-bootstrap</code> campaign points at it as its manifest, so it must be regenerated before a campaign can be re-planned.</p>
+      <p><code>manifests/selfhost-canary-arm64.txt</code> is curated by hand, not derived — 41 sources chosen to fail fast. It is a strict subset of the boundary.</p>
+    </section>
+
+    <section id="s7">
+      <h2 class="sec"><span class="stage-n">07</span>Campaigns</h2>
+      <p class="lede">State lives in SQLite at <code>work/control/rdistro.db</code>. A campaign survives <code>pause</code>, <code>resume</code>, and the controller process dying.</p>
+      <pre><code>scripts/rdistroctl.py doctor --manifest manifests/selfhost-boundary-arm64.txt
+scripts/rdistroctl.py plan   --campaign gen3-bootstrap --generation 3 \
+                             --manifest manifests/selfhost-boundary-arm64.txt
+scripts/rdistroctl.py run    --campaign gen3-bootstrap --parallel 4 --build-jobs 4
+scripts/rdistroctl.py status --campaign gen3-bootstrap
+scripts/rdistroctl.py pause  --campaign gen3-bootstrap
+scripts/rdistroctl.py resume --campaign gen3-bootstrap
+scripts/rdistroctl.py retry-failed --campaign gen3-bootstrap
+scripts/rdistroctl.py dashboard    --campaign gen3-bootstrap   <span class="cm"># 127.0.0.1:8765</span></code></pre>
+      <p><code>doctor</code> checks exactly three things: <code>build-package.sh</code> exists <em>and contains the string</em> <code>RDISTRO_OUTPUT_DIR</code>, <code>docker</code> is on <code>PATH</code>, and the manifest exists. It then prints the build script&rsquo;s SHA-256, the git commit, and the manifest source count. It does not check images, disk space, or the archive server.</p>
+
+      <p><span class="badge b-script">Script</span></p>
+      <div class="tw"><table>
+        <thead><tr><th>Artifact</th><th>Written by</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>work/control/rdistro.db</code></td><td><code>plan</code>, <code>run</code>, <code>retry-failed</code></td><td>Tables <code>campaigns</code>, <code>jobs</code>, <code>attempts</code>, <code>releases</code></td></tr>
+          <tr><td><code>work/control/rdistro.db-wal</code>, <code>-shm</code></td><td>SQLite</td><td>WAL journal; present while the DB is open</td></tr>
+          <tr><td><code>work/campaigns/&lt;c&gt;/controller.json</code></td><td><code>run</code></td><td>Parallelism, build jobs, DB path, timestamp</td></tr>
+          <tr><td><code>work/campaigns/&lt;c&gt;/controller.log</code></td><td><code>run</code></td><td>Detached controller stdout</td></tr>
+          <tr><td><code>work/campaigns/&lt;c&gt;/controller.pid</code></td><td><code>run</code></td><td>PID of the detached <code>_controller</code></td></tr>
+          <tr><td><code>…/&lt;src&gt;/attempt-NNNN/build.log</code></td><td>worker</td><td>Full build log for that attempt</td></tr>
+          <tr><td><code>…/&lt;src&gt;/attempt-NNNN/result.json</code></td><td>worker</td><td>Status, timing, provenance, environment</td></tr>
+          <tr><td><code>…/&lt;src&gt;/attempt-NNNN/artifacts/</code></td><td>worker</td><td><code>RDISTRO_OUTPUT_DIR</code> for that attempt</td></tr>
+        </tbody>
+      </table></div>
+      <p>Attempts are immutable and numbered: a retry writes <code>attempt-0002</code> beside <code>attempt-0001</code> rather than overwriting it, so the evidence from a failure survives the fix. This is what <code>RDISTRO_OUTPUT_DIR</code> exists for.</p>
+
+      <h3>Job state machine</h3>
+      <pre><code>plan  ──INSERT OR IGNORE──▶  PENDING
+                               │  worker claims, in a transaction:
+                               │  status IN ('PENDING','RETRY')
+                               │  ORDER BY attempts ASC, source ASC LIMIT 1
+                               ▼
+                            BUILDING ──exit 0──▶ SUCCEEDED
+                               │  │
+                               │  └──exit≠0──▶ FAILED ──retry-failed──▶ RETRY
+                               │                                          │
+                               └──controller restart───────────────────▶ RETRY</code></pre>
+      <p><code>plan</code> uses <code>INSERT OR IGNORE</code>, so re-planning the same campaign is additive and never resets progress; re-planning with a <em>different</em> generation is refused outright. On startup the controller sweeps stale <code>BUILDING</code> rows to <code>RETRY</code>. Claiming is transactional and re-checks that the campaign is still <code>RUNNING</code>, so <code>pause</code> takes effect between jobs.</p>
+
+      <h3>Failure classification</h3>
+      <p>Failures are classified from the <strong>last 300 KB</strong> of the build log; first pattern wins.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Category</th><th>Triggered by</th></tr></thead>
+        <tbody>
+          <tr><td><code>disk</code></td><td><code>no space left on device</code></td></tr>
+          <tr><td><code>oom</code></td><td><code>out of memory</code>, <code>cannot allocate memory</code>, <code>oom-kill</code></td></tr>
+          <tr><td><code>dependency</code></td><td><code>unmet dependencies</code>, <code>not installable</code>, <code>mk-build-deps: unable</code>, …</td></tr>
+          <tr><td><code>source-fetch</code></td><td><code>failed to fetch</code>, <code>unable to find a source package</code>, …</td></tr>
+          <tr><td><code>tests</code></td><td><code>dh_auto_test</code>, <code>tests failed</code>, <code>failures!!!</code>, …</td></tr>
+          <tr><td><code>configure</code></td><td><code>configure: error:</code>, <code>cmake error</code>, <code>meson.build:</code></td></tr>
+          <tr><td><code>docker</code></td><td><code>cannot connect to the docker daemon</code>, <code>error response from daemon</code>, …</td></tr>
+          <tr><td><code>compile</code></td><td><em>fallback</em> — log contains <code>error:</code>, or <code>make</code> and <code>***</code></td></tr>
+          <tr><td><code>unknown</code></td><td><em>fallback</em> — nothing matched, or the log could not be read</td></tr>
+        </tbody>
+      </table></div>
+      <p><code>scripts/retry-fetch-failures.py</code> is the narrow companion: it re-queues only jobs whose logs show transient network failures against <code>snapshot.debian.org</code>, leaving genuine build errors alone. It writes nothing but the database. Note that it hardcodes its DB path and the campaign name <code>gen3-bootstrap</code> — edit before reuse.</p>
+    </section>
+
+    <section id="s8">
+      <h2 class="sec"><span class="stage-n">08</span>Releases</h2>
+      <p class="lede">Three phases, each refusing to proceed on bad input.</p>
+      <pre><code>scripts/rdistro_repo.py validate --campaign gen3-bootstrap \
+                                 --manifest manifests/selfhost-canary-arm64.txt
+scripts/rdistro_repo.py stage    --campaign gen3-bootstrap \
+                                 --manifest manifests/selfhost-canary-arm64.txt \
+                                 --release gen3-canary
+scripts/rdistro_repo.py promote  --release gen3-canary</code></pre>
+
+      <p><strong><code>validate</code></strong> writes nothing. For every source in the manifest it requires a job that is <code>SUCCEEDED</code>, a recorded successful attempt, an existing artifact directory, and exactly one <code>.dsc</code> at the <code>+rdistro&lt;generation&gt;</code> version the campaign implies.</p>
+
+      <p><strong><code>stage</code></strong> <span class="badge b-script">Script</span> builds into <code>repo/staging/.&lt;release&gt;.tmp-&lt;pid&gt;</code>, then moves it into place. Artifacts are hardlinked, falling back to copy across filesystems; a name collision is a hard error.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Artifact</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>pool/main/r/rdistro/&lt;source&gt;/*</code></td><td><strong>Per-source</strong> pool subdirectories</td></tr>
+          <tr><td><code>dists/&lt;suite&gt;/main/binary-arm64/Packages{,.gz}</code></td><td><code>apt-ftparchive packages</code> + <code>gzip -n -9</code></td></tr>
+          <tr><td><code>dists/&lt;suite&gt;/main/source/Sources{,.gz}</code></td><td><code>apt-ftparchive sources</code></td></tr>
+          <tr><td><code>dists/&lt;suite&gt;/Release</code></td><td><code>Origin</code>/<code>Label</code> <code>R-Distro</code>, <code>Suite</code>/<code>Codename</code> = release name</td></tr>
+          <tr><td><code>dists/&lt;suite&gt;/InRelease</code></td><td><code>gpg --clearsign</code></td></tr>
+          <tr><td><code>dists/&lt;suite&gt;/Release.gpg</code></td><td><code>gpg --armor --detach-sign</code></td></tr>
+          <tr><td><code>keys/rdistro-archive.asc</code></td><td>Public key, copied in</td></tr>
+          <tr><td><code>rdistro-release.json</code></td><td>Release marker, <code>status: STAGED</code></td></tr>
+        </tbody>
+      </table></div>
+      <p><code>--suite</code> defaults to the release name. Metadata generation and signing both happen <em>inside</em> <code>rdistro-buildroot:2026-08-13</code>, not on the host. The signing step copies only persistent key material — <code>pubring.kbx</code>, <code>private-keys-v1.d/</code>, optionally <code>trustdb.gpg</code> and <code>gpg.conf</code> — into <code>/tmp/gnupg</code>, deliberately excluding the gpg-agent sockets from the host GNUPGHOME, chmods everything 700/600, and resolves the key fingerprint via <code>gpg --with-colons</code>.</p>
+
+      <p><strong><code>promote</code></strong> <span class="badge b-script">Script</span> re-checks that <code>Release</code>, <code>Packages</code>, <code>Sources</code> and — when signed — <code>InRelease</code> and <code>Release.gpg</code> all exist, rewrites the marker to <code>status: PROMOTED</code>, then <code>os.rename</code>s staging into <code>repo/releases/&lt;release&gt;/</code>. Same filesystem, so the rename is atomic: a release is either absent or complete, never half-published. Promoting over an existing release is refused.</p>
+
+      <div class="note"><p><strong>Two different pool layouts.</strong> <code>publish-all.sh</code> writes a <em>flat</em> <code>pool/main/r/rdistro/</code>; <code>rdistro_repo.py stage</code> writes <em>per-source</em> <code>pool/main/r/rdistro/&lt;source&gt;/</code>. Both are valid APT pools and both are found by <code>apt-ftparchive</code>, but they are not interchangeable — do not point one tool at the other&rsquo;s output.</p></div>
+    </section>
+
+    <section id="runbook">
+      <h2 class="sec">From-scratch runbook</h2>
+      <p>In dependency order. Steps marked <code>[manual]</code> have no script.</p>
+      <pre><code><span class="cm"># 1. Images                                                    [manual]</span>
+docker build -t r-distro-builder:2026-08-13   builder/
+docker build -t rdistro-buildroot:2026-08-13  buildroot/
+docker build -t rdistro-controller:2026-08-13 controller/
+
+<span class="cm"># 2. Signing key                                               [manual]</span>
+mkdir -p keys/gnupg repo/keys &amp;&amp; chmod 700 keys/gnupg
+GNUPGHOME=keys/gnupg gpg --gen-key
+GNUPGHOME=keys/gnupg gpg --armor --export archive@rdistro.local \
+    &gt; repo/keys/rdistro-archive.asc
+
+<span class="cm"># 3. Generation 1 — build the base against Debian</span>
+PARALLEL=2 BUILD_JOBS=4 scripts/build-base.sh 1
+scripts/publish-all.sh
+
+<span class="cm"># 4. Serve the archive                                         [manual]</span>
+mkdir -p work/services
+(cd repo &amp;&amp; nohup python3 -m http.server 8080 \
+    &gt; ../work/services/repo-server.log 2&gt;&amp;1 &amp; \
+    echo $! &gt; ../work/services/repo-server.pid)
+
+<span class="cm"># 5. Generation 2 — build against generation 1</span>
+USE_RDISTRO=1 PARALLEL=2 scripts/build-base.sh 2
+scripts/publish-all.sh
+
+<span class="cm"># 6. Analysis (needs a gen-2 tree in work/builds — see caveat 7)</span>
+scripts/analyze-deps.py
+scripts/analyze-bootstrap-closure.py   --refresh
+scripts/analyze-bootstrap-recursive.py --refresh --mode bootstrap
+scripts/analyze-bootstrap-recursive.py --mode full
+scripts/filter-botch-universe.py
+
+<span class="cm"># 7. The boundary</span>
+scripts/analyze-selfhost-boundary.py
+cp analysis/selfhost-boundary/BOUNDARY.md \
+   manifests/selfhost-boundary-arm64.md                       <span class="cm"># [manual]</span>
+cp analysis/selfhost-boundary/boundary-source-names.txt \
+   manifests/selfhost-boundary-arm64.txt                      <span class="cm"># [manual]</span>
+
+<span class="cm"># 8. Canary — 41 packages, fails fast</span>
+scripts/rdistroctl.py doctor --manifest manifests/selfhost-canary-arm64.txt
+scripts/rdistroctl.py plan   --campaign gen3-bootstrap --generation 3 \
+                             --manifest manifests/selfhost-boundary-arm64.txt
+scripts/rdistroctl.py run    --campaign gen3-bootstrap --parallel 4 \
+                             --only-manifest manifests/selfhost-canary-arm64.txt
+
+<span class="cm"># 9. Promote the canary</span>
+scripts/rdistro_repo.py validate --campaign gen3-bootstrap \
+                                 --manifest manifests/selfhost-canary-arm64.txt
+scripts/rdistro_repo.py stage    --campaign gen3-bootstrap \
+                                 --manifest manifests/selfhost-canary-arm64.txt \
+                                 --release gen3-canary
+scripts/rdistro_repo.py promote  --release gen3-canary
+
+<span class="cm"># 10. The full boundary campaign</span>
+scripts/rdistroctl.py run --campaign gen3-bootstrap --parallel 4</code></pre>
+    </section>
+
+    <section id="stranded">
+      <h2 class="sec">Stranded artifacts</h2>
+      <p class="lede">Twenty categories of file exist in this tree that no current script produces. Each is listed with what made it, why it is stranded, and what happens if you run the nearest equivalent today.</p>
+
+      <div class="stranded-item" id="st1"><div class="idx">01</div><div>
+        <h4>analysis/bootstrap/full/</h4>
+        <p>An earlier run of <code>analyze-bootstrap-closure.py</code> from when its <code>OUT</code> constant pointed at <code>full/</code>. It has its own <code>full/cache/</code> and contains <code>bootstrap-critical.csv</code>, which no current script emits anywhere. <code>OUT</code> is now hardcoded to <code>reduced/</code>, and <code>--mode</code> does not change it — so re-running overwrites <code>reduced/</code> and never touches <code>full/</code>.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st2"><div class="idx">02</div><div>
+        <h4>analysis/bootstrap/recursive-baseline/</h4>
+        <p>Identical file set to <code>recursive/</code>, but no <code>--mode</code> writes to this path. A baseline run kept for before/after comparison when build profiles were introduced.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st3"><div class="idx">03</div><div>
+        <h4>analysis/bootstrap/botch/</h4>
+        <p><code>pandas_2.3.3+dfsg-3.{dot,svg}</code> and <code>qemu_1:11.0.3+ds-2.{dot,svg}</code> — per-package build graphs from manual <code>botch</code> invocations while evaluating the tool.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st4"><div class="idx">04</div><div>
+        <h4>analysis/bootstrap/botch-bootstrap/</h4>
+        <p><code>current-Packages</code>, <code>current-Sources</code>, <code>self-Packages</code>, <code>self-Sources</code>, <code>target-Sources</code> and <code>iteration.graph.xml</code> from a manual botch bootstrap iteration. <code>needed-Packages</code> and <code>needed-Sources</code> are <strong>0 bytes</strong> — the iteration either found nothing needed or did not complete.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st5"><div class="idx">05</div><div>
+        <h4>analysis/bootstrap/botch-rdistro/{buildgraph.xml, fvs.txt}</h4>
+        <p>The <em>directory</em> is script-produced, but <code>filter-botch-universe.py</code> writes only <code>Sources</code> and <code>Packages</code>. These two came from manual <code>botch-buildgraph</code> / <code>botch-fvs</code> runs. <code>fvs.txt</code> is <strong>0 bytes</strong>.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st6"><div class="idx">06</div><div>
+        <h4>manifests/selfhost-boundary-arm64.{md,txt}</h4>
+        <p>Byte-identical manual copies of <code>analysis/selfhost-boundary/BOUNDARY.md</code> and <code>boundary-source-names.txt</code>. No script performs the copy. The <code>.txt</code> is what the <code>gen3-bootstrap</code> campaign uses as its manifest, so it must be recreated before a campaign is re-planned.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st7"><div class="idx">07</div><div>
+        <h4>analysis/pass2/ cannot be regenerated from a non-gen-2 tree</h4>
+        <p><code>analyze-deps.py</code> globs <code>*+rdistro2.dsc</code>. Point it at a gen-1 or gen-3 <code>work/builds</code> and it warns for every source and produces empty results. The generation is hardcoded, not a parameter.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st8"><div class="idx">08</div><div>
+        <h4>repo-pass1/, repo-pass2/</h4>
+        <p>438 MB each — manual <code>cp -a repo repo-passN</code> snapshots taken after generations 1 and 2. No script references <code>repo-pass</code>. They are frozen copies of the development archive at those two moments and cannot be recreated except by rebuilding those generations.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st9"><div class="idx">09</div><div>
+        <h4>work/builds-pass1/, work/builds-pass2/</h4>
+        <p>56 directories each — manual snapshots of <code>work/builds</code> at the same two moments, taken because <code>build-package.sh</code> wipes its output directory on every run.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st10"><div class="idx">10</div><div>
+        <h4>work/src/</h4>
+        <p>An early host-side <code>apt-get source hello</code> workspace, including an unpacked <code>hello-2.12.3/</code> tree. Current builds fetch and unpack source <em>inside</em> the container at <code>/build/work</code>; nothing is written here any more.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st11"><div class="idx">11</div><div>
+        <h4>out/hello*.deb</h4>
+        <p>The earliest ad-hoc build output. Even the pre-policy version of <code>build-package.sh</code> wrote to <code>work/builds/$PKG</code>, so this directory predates the script entirely.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st12"><div class="idx">12</div><div>
+        <h4>repo/pool/main/h/hello/</h4>
+        <p>Standard APT pool layout — <code>pool/main/&lt;first-letter&gt;/&lt;source&gt;/</code> — from the earliest publish, before the pool was consolidated under <code>pool/main/r/rdistro/</code>. <code>publish-all.sh</code> rebuilds and indexes only <code>pool/main/r/rdistro</code>, so this directory survives every republish and is never indexed: dead weight in the archive tree.</p>
+        <p>The legacy <code>publish.sh</code> is the exception — it runs <code>apt-ftparchive packages pool/main</code>, scanning the whole component, and would pull these two <code>.deb</code> files into the signed development index. The <code>hello</code> entries currently in the index are <em>not</em> these; their <code>Filename:</code> fields point at <code>pool/main/r/rdistro/</code>, from a separate <code>+rdistro1</code> build.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st13"><div class="idx">13</div><div>
+        <h4>Stray files directly in work/builds/</h4>
+        <p><code>hello_2.12.3-1+rdistro2_arm64.{build,buildinfo,changes,deb}</code>, <code>hello-dbgsym_…deb</code>, and a timestamped <code>hello_…-2026-08-14T08:11:15Z.build</code> sitting outside any per-package subdirectory — from an early run where the output directory was <code>work/builds</code> itself. <code>analyze-deps.py</code> iterates manifest names, so it ignores them.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st14"><div class="idx">14</div><div>
+        <h4>logs/pass1/*-nonroot.log, logs/pass1/tar-serial.log</h4>
+        <p><code>coreutils-</code>, <code>ncurses-</code>, <code>sed-</code>, <code>systemd-</code>, <code>tar-</code> and <code>vim-nonroot.log</code>, plus <code>tar-serial.log</code> — hand-named manual reruns from when the root/non-root split in the build was being debugged. <code>coreutils-nonroot.log</code> is really a <code>coreutils</code> build; its first action is <code>apt-get source coreutils</code>, and the suffix is a human annotation. <code>build-base.sh</code> only ever writes <code>&lt;pkg&gt;.log</code> for names that appear in <code>base-sources.txt</code>.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st15"><div class="idx">15</div><div>
+        <h4>logs/pass2/e2fsprogs-retry.log</h4>
+        <p>The same pattern — a hand-named single-package retry during pass 2.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st16"><div class="idx">16</div><div>
+        <h4>work/control/rdistro-canary-green.db, rdistro-pre-full-gen3.db</h4>
+        <p>Manual <code>cp</code> backups of the controller database taken at two milestones: immediately after the canary went green, and immediately before the full boundary campaign started. No script creates or rotates these.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st17"><div class="idx">17</div><div>
+        <h4>work/services/*</h4>
+        <p><code>repo-server.{log,pid}</code> and <code>dashboard.{log,pid}</code>. Both processes are started by hand. This is the largest reproducibility gap in the project, because builds depend on the server without ever checking for it.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st18"><div class="idx">18</div><div>
+        <h4>keys/gnupg/</h4>
+        <p>Manual <code>gpg --gen-key</code>; <code>repo/keys/rdistro-archive.asc</code> is the manual export. <code>.gitignore</code> excludes both, and <code>pubring.kbx~</code> is GnuPG&rsquo;s own backup file.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st19"><div class="idx">19</div><div>
+        <h4>tree.txt</h4>
+        <p>A 987 KB <code>tree</code> dump of the entire working tree, taken by hand on 2026-08-20. A snapshot of a directory listing, not an input to anything.</p>
+      </div></div>
+
+      <div class="stranded-item" id="st20"><div class="idx">20</div><div>
+        <h4>.DS_Store</h4>
+        <p>macOS Finder metadata, at the repository root and in <code>manifests/</code>, <code>repo/</code>, <code>analysis/</code>, <code>analysis/bootstrap/</code> and <code>work/campaigns/gen3-bootstrap/</code>.</p>
+      </div></div>
+    </section>
+
+    <section id="schema">
+      <h2 class="sec">Database schema</h2>
+      <p><code>work/control/rdistro.db</code>, created by <code>rdistroctl.py plan</code>.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Table</th><th>Key</th><th>Contents</th></tr></thead>
+        <tbody>
+          <tr><td><code>campaigns</code></td><td><code>name</code></td><td><code>generation</code>, <code>manifest_path</code>, <code>manifest_sha256</code>, <code>created_at</code>, <code>git_commit</code>, <code>status</code>. The manifest hash is what lets you prove later which package set a campaign actually covered.</td></tr>
+          <tr><td><code>jobs</code></td><td><code>(campaign, source)</code></td><td><code>status</code>, <code>attempts</code>, timings, <code>exit_code</code>, <code>failure_category</code>, <code>last_error</code>, <code>latest_{attempt_dir,log,buildinfo}</code>, and the provenance rollup <code>total_/rdistro_/debian_build_deps</code>.</td></tr>
+          <tr><td><code>attempts</code></td><td><code>id</code> (autoinc)</td><td>Append-only. Everything in <code>jobs</code> plus <code>attempt</code>, <code>attempt_dir</code>, <code>log_path</code>, <code>buildinfo_path</code>, <code>git_commit</code>, <code>build_script_sha256</code>, <code>environment_json</code>. Never updated in place.</td></tr>
+          <tr><td><code>releases</code></td><td><code>name</code></td><td>Written by <code>rdistro_repo.py</code>: <code>campaign</code>, <code>generation</code>, <code>suite</code>, manifest path and hash, <code>source_count</code>, <code>artifact_count</code>, <code>status</code>, <code>staging_path</code>, <code>release_path</code>, <code>created_at</code>, <code>promoted_at</code>.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>result.json</h3>
+      <p>Written per attempt. <code>provenance</code> is parsed from the <code>.buildinfo</code>&rsquo;s <code>Installed-Build-Depends</code> and is the measurement the whole project exists to produce.</p>
+      <pre><code>{
+  "campaign": "gen3-bootstrap",
+  "source": "libiberty",
+  "attempt": 1,
+  "status": "SUCCEEDED",
+  "duration_sec": 32.77,
+  "provenance": { "total": 139, "rdistro": 45, "debian": 94 },
+  "environment": {
+    "build_script_sha256": "41d241a9…cab436",
+    "generation": 3,
+    "use_rdistro": 1,
+    "deb_build_profiles": "nocheck nodoc"
+  }
+}</code></pre>
+      <p>Of 139 build dependencies, 45 came from R-Distro and 94 still came from Debian. <strong>Self-hosting is the state where <code>debian</code> reaches zero.</strong> <code>build_script_sha256</code> pins which version of <code>build-package.sh</code> produced the result.</p>
+
+      <h3>rdistro-release.json</h3>
+      <p>Written to the staging root by <code>stage</code>, rewritten in place by <code>promote</code>. Carries <code>release</code>, <code>suite</code>, <code>campaign</code>, <code>generation</code>, the manifest path and its SHA-256, <code>source_count</code>, <code>artifact_count</code>, <code>git_commit</code>, <code>signed</code>, <code>status</code>, and both timestamps.</p>
+      <div class="note"><p>The <code>git_commit</code> recorded in the promoted <code>gen3-canary</code> marker is <code>ffbb3bd4…</code>, which no longer resolves — the repository history was re-initialised after that release was promoted.</p></div>
+    </section>
+
+    <section id="state">
+      <h2 class="sec">Current state</h2>
+      <p>A point-in-time snapshot, read from <code>work/control/rdistro.db</code> on 2026-08-24. These numbers drift as the campaign advances.</p>
+
+      <h3>Releases</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Release</th><th>Status</th><th>Sources</th><th>Artifacts</th></tr></thead>
+        <tbody>
+          <tr><td><code>gen3-canary</code></td><td>Promoted, signed</td><td class="num">41</td><td class="num">1061</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Campaign <code>gen3-bootstrap</code> — generation 3, 4725 sources</h3>
+      <div class="stats">
+        <div class="stat"><p class="k">Succeeded</p><p class="v ok">1910</p></div>
+        <div class="stat"><p class="k">Pending</p><p class="v dim">2552</p></div>
+        <div class="stat"><p class="k">Retry</p><p class="v warn">188</p></div>
+        <div class="stat"><p class="k">Failed</p><p class="v">71</p></div>
+        <div class="stat"><p class="k">Building</p><p class="v dim">4</p></div>
+        <div class="stat"><p class="k">Attempts</p><p class="v dim">2189</p></div>
+      </div>
+      <p>Of the 71 current failures, 61 are <code>source-fetch</code> — transient <code>snapshot.debian.org</code> errors, requeued by <code>retry-fetch-failures.py</code> — 7 are <code>tests</code>, and 3 are <code>compile</code>.</p>
+
+      <h3>On disk</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Directory</th><th>Size</th></tr></thead>
+        <tbody>
+          <tr><td><code>work/campaigns/</code></td><td class="num">28 G</td></tr>
+          <tr><td><code>repo/releases/</code></td><td class="num">9.6 G</td></tr>
+          <tr><td><code>repo/pool/</code></td><td class="num">438 M</td></tr>
+          <tr><td><code>repo-pass1/</code>, <code>repo-pass2/</code></td><td class="num">438 M ea.</td></tr>
+          <tr><td><code>analysis/</code></td><td class="num">387 M</td></tr>
+          <tr><td><code>logs/</code></td><td class="num">170 M</td></tr>
+          <tr><td>Tracked source</td><td class="num">350 K</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>R-Distro rebuilds the Debian forky ARM64 base system from source against snapshot <code>20260813T165000Z</code>. This reference is generated from the tracked scripts themselves — every command here was cross-checked against argparse defaults and hardcoded output paths rather than inferred from directory names.</p>
+  </footer>
+
+</div>

@@ -176,7 +176,10 @@ refused.
 ## What is not in this repository
 
 Git holds source, configuration, policy, documentation and frozen input
-definitions. It does not hold anything the tracked scripts can produce:
+definitions. It does not hold anything the tracked scripts can produce.
+[`docs/GENERATED-ARTIFACTS.md`](docs/GENERATED-ARTIFACTS.md) traces every
+generated artifact back to the command that produces it, and names the twenty
+that no current script can produce any more.
 
 | Untracked | Regenerate with |
 |---|---|
