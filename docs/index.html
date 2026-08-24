@@ -1,3 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Traces every generated artifact in the R-Distro tree back to the command that produced it, and names the twenty that no current script can produce.">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://rshrj.github.io/r-distro/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="R-Distro">
+<meta property="og:title" content="R-Distro — Artifact Provenance">
+<meta property="og:description" content="Every generated artifact traced back to the command that produced it — and the twenty that no current script can produce.">
+<meta property="og:url" content="https://rshrj.github.io/r-distro/">
+<meta property="og:image" content="https://rshrj.github.io/r-distro/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128230;</text></svg>">
 <title>R-Distro Artifact Provenance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -448,11 +464,14 @@ footer p { max-width: 70ch; }
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 </style>
+</head>
+<body>
+
 
 <div class="shell">
 
   <header class="masthead">
-    <p class="eyebrow">R-Distro · Reference</p>
+    <p class="eyebrow"><a href="https://github.com/rshrj/r-distro">R-Distro</a> · Reference</p>
     <h1>Artifact Provenance</h1>
     <p class="standfirst">Every file in this tree is either tracked source or generated output. This walks each generated artifact back to the exact command that produced it — and names the twenty that no current script can produce any more.</p>
     <div class="masthead-meta">
@@ -1099,3 +1118,5 @@ scripts/rdistroctl.py run --campaign gen3-bootstrap --parallel 4</code></pre>
   </footer>
 
 </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 306" width="1280" height="306" role="img" aria-label="R-Distro — rebuilding the Debian ARM64 base system from source, and measuring where self-hosting closes">
+  <rect x="0" y="0" width="1280" height="306" fill="#0E1115"/>
+  <rect x="0" y="0" width="1280" height="4" fill="#DE8462"/>
+
+  <text x="88" y="106" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="13" letter-spacing="2.6" fill="#949DAA">DEBIAN FORKY &#183; ARM64 &#183; SNAPSHOT 20260813T165000Z</text>
+  <text x="88" y="184" font-family="Georgia, Times New Roman, serif" font-size="70" fill="#E5E9EE">R-Distro</text>
+  <text x="88" y="228" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">Rebuilding the base system from source &#8212; and measuring</text>
+  <text x="88" y="254" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">where self-hosting closes.</text>
+
+  <g font-family="Menlo, DejaVu Sans Mono, monospace" font-size="15">
+    <rect x="800" y="124" width="108" height="38" rx="4" fill="#15191F" stroke="#2A313A"/>
+    <text x="854" y="149" text-anchor="middle" fill="#E5E9EE">+rdistro1</text>
+    <rect x="930" y="124" width="108" height="38" rx="4" fill="#15191F" stroke="#2A313A"/>
+    <text x="984" y="149" text-anchor="middle" fill="#E5E9EE">+rdistro2</text>
+    <rect x="1060" y="124" width="108" height="38" rx="4" fill="#15191F" stroke="#DE8462" stroke-width="1.6"/>
+    <text x="1114" y="149" text-anchor="middle" fill="#DE8462">+rdistro3</text>
+  </g>
+
+  <path d="M 908 143 L 923 143" stroke="#949DAA" stroke-width="1.4"/>
+  <path d="M 928 143 l -6 -4 v 8 z" fill="#949DAA"/>
+  <path d="M 1038 143 L 1053 143" stroke="#949DAA" stroke-width="1.4"/>
+  <path d="M 1058 143 l -6 -4 v 8 z" fill="#949DAA"/>
+
+  <path d="M 1114 168 L 1114 194 L 854 194 L 854 172" fill="none" stroke="#DE8462" stroke-width="1.5"/>
+  <path d="M 854 162 l -4 8 h 8 z" fill="#DE8462"/>
+  <text x="984" y="230" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#DE8462">each generation builds the next</text>
+</svg>

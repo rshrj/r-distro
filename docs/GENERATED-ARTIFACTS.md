@@ -1,5 +1,7 @@
 # Generated Artifacts — Provenance Reference
 
+> Also available as a designed, browsable page: **<https://rshrj.github.io/r-distro/>**
+
 Every file in this working tree is either **tracked source** or **generated output**.
 Git holds only the first kind: source, configuration, policy, documentation, and frozen
 input definitions — 27 files, about 350 KB. Everything else, roughly 31 GB, is produced
