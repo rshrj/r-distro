@@ -295,3 +295,5 @@ that key should never be this one.
 ## License
 
 [MIT](LICENSE) © Rishi Raj
+
+Typefaces: [Inter](https://github.com/rsms/inter) and [Fira Mono](https://github.com/mozilla/Fira), both under the [SIL Open Font License 1.1](docs/assets/fonts/) and bundled with the docs site.

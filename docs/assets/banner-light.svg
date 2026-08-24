@@ -3,9 +3,9 @@
   <rect x="0" y="0" width="1280" height="4" fill="#A0472A"/>
 
   <text x="88" y="106" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="13" letter-spacing="2.6" fill="#5C6673">DEBIAN FORKY &#183; ARM64 &#183; SNAPSHOT 20260813T165000Z</text>
-  <text x="88" y="184" font-family="Georgia, Times New Roman, serif" font-size="70" fill="#14171C">R-Distro</text>
-  <text x="88" y="228" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#5C6673">An independently built Debian derivative &#8212;</text>
-  <text x="88" y="254" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#5C6673">rebuilt from source, signed, and owned end to end.</text>
+  <text x="88" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="62" font-weight="700" letter-spacing="-2.4" fill="#14171C">R-Distro</text>
+  <text x="88" y="228" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#5C6673">An independently built Debian derivative &#8212;</text>
+  <text x="88" y="254" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#5C6673">rebuilt from source, signed, and owned end to end.</text>
 
   <g font-family="Menlo, DejaVu Sans Mono, monospace" font-size="15">
     <rect x="800" y="124" width="108" height="38" rx="4" fill="#FFFFFF" stroke="#DCE0E6"/>
@@ -23,5 +23,5 @@
 
   <path d="M 1114 168 L 1114 194 L 854 194 L 854 172" fill="none" stroke="#A0472A" stroke-width="1.5"/>
   <path d="M 854 162 l -4 8 h 8 z" fill="#A0472A"/>
-  <text x="984" y="230" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#A0472A">each generation builds the next</text>
+  <text x="984" y="230" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" fill="#A0472A">each generation builds the next</text>
 </svg>
