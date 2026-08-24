@@ -1,10 +1,22 @@
 # Generated Artifacts — Provenance Reference
 
-> Also available as a designed, browsable page: **<https://rshrj.github.io/r-distro/>**
+> Part of [R-Distro](https://rshrj.github.io/r-distro/). Also available as a designed,
+> browsable page: **<https://rshrj.github.io/r-distro/provenance.html>**
+
+R-Distro rebuilds Debian's ARM64 base from source so that depending on Debian becomes a
+choice rather than a necessity. The destination is a rolling system in the spirit of
+Google's gLinux — one that tracks Debian testing continuously, carries local patches
+across each advance, and composes the result into images for a fleet. What exists today
+is the build half of that loop; see the [roadmap](https://rshrj.github.io/r-distro/#roadmap)
+for what does not.
+
+That ambition is why this document exists. A system that rebuilds itself repeatedly only
+means something if you can say exactly where each artifact came from — and, just as
+importantly, which ones you can no longer reproduce.
 
 Every file in this working tree is either **tracked source** or **generated output**.
 Git holds only the first kind: source, configuration, policy, documentation, and frozen
-input definitions — 27 files, about 350 KB. Everything else, roughly 31 GB, is produced
+input definitions — 36 files, about 470 KB. Everything else, roughly 31 GB, is produced
 by running the tracked scripts.
 
 This document walks each generated artifact back to the exact command that produces it,
@@ -62,6 +74,33 @@ flowchart TD
 The loop at the bottom is the point of the project: each generation is promoted to an
 immutable signed archive, and the generation after it builds against that archive
 instead of against Debian.
+
+### Where this is going
+
+The pipeline above starts from a snapshot someone pinned by hand. The target replaces
+that with a loop that advances the pin on its own, rebuilding only what Debian changed
+and carrying local patches across each advance. Dotted edges do not exist yet.
+
+```mermaid
+flowchart LR
+    A["Debian testing<br/>snapshot N"] -.->|when the pin advances| B["snapshot diff"]
+    B -.-> C["changed sources"]
+    P["your patches"] -.->|inject| D["patch rebase"]
+    C -.-> D
+    D -.->|only what changed| E["build"]
+    E --> F["validate + promote"]
+    F --> G["signed release<br/>generation N"]
+    G -->|"USE_RDISTRO=1 · next generation"| E
+    G -.->|compose| H["ISO / image<br/>for a fleet"]
+
+    style E stroke-width:2px
+    style F stroke-width:2px
+    style G stroke-width:2px
+```
+
+Solid edges work today. Everything dotted — snapshot diffing, patch injection, patch
+rebase detection, image composition — is described in the
+[roadmap](https://rshrj.github.io/r-distro/#roadmap).
 
 ---
 
@@ -825,4 +864,4 @@ errors, requeued by `retry-fetch-failures.py`), 7 are `tests`, and 3 are `compil
 | `repo-pass1/`, `repo-pass2/` | 438 M each |
 | `analysis/` | 387 M |
 | `logs/` | 170 M |
-| Tracked source | ~350 K |
+| Tracked source | ~470 K |

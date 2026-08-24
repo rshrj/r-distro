@@ -1,12 +1,12 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
-    <img alt="R-Distro — rebuilding the Debian ARM64 base system from source, and measuring where self-hosting closes" src="docs/assets/banner-light.svg" width="100%">
+    <img alt="R-Distro — an independently built Debian derivative, rebuilt from source, signed, and owned end to end" src="docs/assets/banner-light.svg" width="100%">
   </picture>
 </p>
 
 <p align="center">
-  <a href="https://rshrj.github.io/r-distro/"><img alt="Documentation" src="https://img.shields.io/badge/docs-artifact%20provenance-A0472A?style=flat-square"></a>
+  <a href="https://rshrj.github.io/r-distro/"><img alt="Documentation" src="https://img.shields.io/badge/docs-rshrj.github.io%2Fr--distro-A0472A?style=flat-square"></a>
   <img alt="Debian forky at snapshot 20260813T165000Z" src="https://img.shields.io/badge/debian-forky%20%40%2020260813T165000Z-A81D33?style=flat-square&logo=debian&logoColor=white">
   <img alt="Architecture arm64" src="https://img.shields.io/badge/arch-arm64-5C6673?style=flat-square">
   <img alt="Self-hosting boundary: 4725 sources" src="https://img.shields.io/badge/self--hosting%20boundary-4725%20sources-2C6A4C?style=flat-square">
@@ -15,19 +15,51 @@
 </p>
 
 <p align="center">
-  <b><a href="https://rshrj.github.io/r-distro/">Artifact Provenance Reference&nbsp;→</a></b>
+  <b><a href="https://rshrj.github.io/r-distro/">Documentation</a></b> &nbsp;·&nbsp;
+  <a href="https://rshrj.github.io/r-distro/#roadmap">Roadmap</a> &nbsp;·&nbsp;
+  <a href="https://rshrj.github.io/r-distro/provenance.html">Artifact provenance</a>
 </p>
 
 ---
 
-R-Distro rebuilds the Debian **forky** ARM64 base system from source and finds out how
-much of it can be built without Debian binaries at all.
+Most Linux distributions are things you consume. **R-Distro is an attempt to build one you
+own** — where depending on Debian is a choice rather than a necessity.
 
-The interesting question is not *can these packages be recompiled* — they can — but
-**where the circle closes**. A compiler needs a compiler. `dpkg` needs `dpkg`. This
-repository contains the tooling that pins the inputs, computes that boundary precisely,
-rebuilds it, and publishes each pass as an immutable signed archive that the next pass
-builds against.
+The tooling here pins Debian to an exact snapshot, rebuilds its ARM64 base from source, and
+publishes each pass as an immutable signed archive that the next pass builds against. The
+destination is a rolling system that tracks Debian testing continuously, carries local
+patches across each advance, and composes the result into images for a fleet.
+
+1. **Own the tooling.** Be able to rebuild Debian's base yourself, and know exactly which
+   packages you still cannot. That measurement is the [self-hosting boundary](#the-self-hosting-boundary).
+2. **Inject your own code.** A defined point in the pipeline where local patches — or your
+   own versions of a source package entirely — enter the build and travel with it across
+   every subsequent update.
+3. **Ship a distribution.** Compose Debian, that tooling, and the custom code into
+   installable artifacts for a managed fleet of machines.
+
+> **The pinned snapshot is a stage, not the design.** Advancing the pin — safely,
+> repeatedly, carrying your patches with it — is the actual product. Everything currently
+> here is scaffolding for that.
+
+## Background
+
+The idea comes from **gLinux**, Google's in-house Linux distribution for workstations. Its
+current incarnation, **Rodete** — "Rolling Debian Testing" — replaced an Ubuntu LTS-based
+predecessor, and the argument for it, laid out in public DebConf talks, was that
+*continuous small migrations beat big-bang ones*. Rather than a painful distribution
+upgrade every two years, gLinux tracks Debian testing and moves forward in small, tested
+increments.
+
+The machinery behind it continuously ingests Debian, rebuilds it, rebases local patches on
+top, gates on tests, and advances the tracked snapshot only when the result is good.
+R-Distro is that idea rebuilt from scratch at a scale one person can operate.
+
+The differences are honest ones. Google rebuilds the whole archive because Google has the
+compute. R-Distro computes the *minimum* set that must be rebuilt for the claim to mean
+anything, and lets everything else fall through to Debian unchanged — a hybrid archive that
+works because `+rdistroN` sorts above Debian's own versions while preserving upstream
+ordering.
 
 ## Frozen inputs
 
@@ -44,10 +76,10 @@ resolving indefinitely rather than expiring out from under a multi-day campaign.
 
 ## Generations
 
-A generation is a complete rebuild of a package set. Generation *N* stamps every package
-it produces with a `+rdistroN` version suffix — high enough to win against Debian's
-version, low enough to preserve upstream ordering — and is promoted as an immutable
-signed release before the next generation starts.
+A generation is a complete rebuild of a package set. Generation *N* stamps every package it
+produces with a `+rdistroN` version suffix — high enough to win against Debian's version,
+low enough to preserve upstream ordering — and is promoted as an immutable signed release
+before the next generation starts.
 
 | | Built against | Version suffix |
 |---|---|---|
@@ -57,14 +89,14 @@ signed release before the next generation starts.
 | **Gen 4** | *the proof* — Gen 3 rebuilt using only Gen 3 | `+rdistro4` |
 
 Self-hosting is claimed only where a generation can be rebuilt entirely from the previous
-generation's own binaries. Everything before Gen 4 is scaffolding for that measurement.
+generation's own binaries.
 
 ## The self-hosting boundary
 
 [`scripts/analyze-selfhost-boundary.py`](scripts/analyze-selfhost-boundary.py) computes
 which packages must be buildable for the ARM64 base to be self-hosting. From the 49 base
-sources it expands `required` / `important` / `essential` / `build-essential` binaries
-plus `Build-Depends`, `Build-Depends-Arch`, `Pre-Depends` and `Depends`, under the
+sources it expands `required` / `important` / `essential` / `build-essential` binaries plus
+`Build-Depends`, `Build-Depends-Arch`, `Pre-Depends` and `Depends`, under the
 `nocheck nodoc` profiles, and recurses until a full round discovers nothing new.
 
 It is a **fixed point**, not a truncated walk — the same snapshot always yields the same
@@ -78,13 +110,41 @@ base.
 
 Full result: [`manifests/selfhost-boundary-arm64.md`](manifests/selfhost-boundary-arm64.md)
 
+## Roadmap
+
+Half the loop exists. The [documentation site](https://rshrj.github.io/r-distro/#roadmap)
+carries the detail and the evidence for each claim.
+
+**Shipped** — pinned reproducible build environment · source rebuild with generational
+versioning · package build policy as data · signed APT archive · dependency closure
+analysis from both observed *and* declared metadata · deterministic self-hosting boundary ·
+durable campaign controller with immutable attempts and failure classification · validated
+immutable release promotion · per-build provenance measurement.
+
+**Next** — the gap between a pinned rebuild and a rolling distribution:
+
+- **Parameterise the pin.** The snapshot is hardcoded in all three Dockerfiles and the date
+  is baked into image tags across seven tracked files, while
+  `manifests/2026-08-13/bootstrap-snapshot.txt` declares it as data that nothing reads.
+- **Snapshot diff → changed-source manifest.** The missing primitive, and the cheapest —
+  `Sources` index parsing, not compute. Feeds the existing `rdistroctl plan --manifest`
+  unchanged.
+- **Patch injection.** No mechanism exists yet. Natural home is `patches/<source>/`,
+  applied where `PRE_BUILD_COMMAND` already hooks in.
+- **Patch rebase detection.** Notice when a local patch stops applying or lands upstream,
+  and drop it. This is what makes it a system rather than a pile of diffs.
+
+**Planned** — test gating (`autopkgtest` and `sbuild` ship in the controller image but are
+not yet invoked) · explicit hybrid-archive policy · image composition to an ISO.
+
 ## Status
 
 - **`gen3-canary`** — promoted. The 41-package canary in
   [`manifests/selfhost-canary-arm64.txt`](manifests/selfhost-canary-arm64.txt) rebuilt
-  clean: 1061 signed artifacts, including the full toolchain, the kernel, and the
-  packaging tools that build everything else.
-- **`gen3-bootstrap`** — in progress across the full 4725-source boundary.
+  clean: 1061 signed artifacts, including the full toolchain, the kernel, and the packaging
+  tools that build everything else.
+- **`gen3-bootstrap`** — in progress across the full 4725-source boundary; 2054 sources
+  rebuilt so far.
 
 ## Quick start
 
@@ -103,8 +163,7 @@ scripts/build-package.sh hello 1
 ```
 
 Artifacts land in `work/builds/hello`. Set `USE_RDISTRO=1` to build against a running
-R-Distro archive instead of Debian binaries; `RDISTRO_OUTPUT_DIR` overrides the output
-path.
+R-Distro archive instead of Debian binaries; `RDISTRO_OUTPUT_DIR` overrides the output path.
 
 Packages needing an exception declare it in `config/package-policy/$PKG.env` rather than
 being special-cased in the build script:
@@ -129,9 +188,9 @@ scripts/rdistroctl.py status --campaign gen3-bootstrap
 ```
 
 State lives in SQLite. A campaign survives `pause`, `resume`, and the controller process
-dying. Every build is an immutable attempt with its own artifact directory, so a retry
-never destroys the evidence from the attempt before it, and failures are classified from
-their logs — which is what turns several hundred red jobs into a handful of real problems.
+dying. Every build is an immutable attempt with its own artifact directory, so a retry never
+destroys the evidence from the attempt before it, and failures are classified from their
+logs — which is what turns several hundred red jobs into a handful of real problems.
 
 ### Publishing a release
 
@@ -150,14 +209,26 @@ hardlinks artifacts, generates APT indices and signs `Release`. `promote` rename
 into `repo/releases/` on the same filesystem — an atomic rename, so a release is either
 absent or complete, never half-published.
 
+## Scale
+
+All of this runs on a single **MacBook Pro M3 Pro**. No build farm, no CI fleet, no object
+storage.
+
+That constraint shapes the architecture rather than limiting the ambition. Rebuilding the
+entire Debian archive is not available; computing the minimum set that must be rebuilt, and
+rebuilding only what changed since the last snapshot, is. Both are better engineering than
+brute force — and both were forced by the constraint.
+
 ## Documentation
 
-**[Artifact Provenance Reference →](https://rshrj.github.io/r-distro/)**
+**[rshrj.github.io/r-distro →](https://rshrj.github.io/r-distro/)**
 
-Every generated artifact traced back to the exact command that produces it, stage by
-stage, plus a from-scratch runbook and the twenty artifacts on disk that **no current
-script can produce any more**. Also available as
-[Markdown](docs/GENERATED-ARTIFACTS.md).
+- [**Roadmap**](https://rshrj.github.io/r-distro/#roadmap) — what is built, what is next,
+  and the evidence for each claim.
+- [**Artifact provenance**](https://rshrj.github.io/r-distro/provenance.html) — every
+  generated artifact traced back to the exact command that produces it, plus a from-scratch
+  runbook and the twenty artifacts on disk that **no current script can produce any more**.
+  Also available as [Markdown](docs/GENERATED-ARTIFACTS.md).
 
 ## Layout
 
@@ -197,9 +268,9 @@ scripts/
 
 ## What is not in this repository
 
-Git holds source, configuration, policy, documentation and frozen input definitions —
-29 files, about 380 KB. It does not hold anything the tracked scripts can produce, which
-is roughly **31 GB** of build roots, APT pools, analysis dumps and logs.
+Git holds source, configuration, policy, documentation and frozen input definitions. It does
+not hold anything the tracked scripts can produce, which is roughly **31 GB** of build
+roots, APT pools, analysis dumps and logs.
 
 | Untracked | Regenerate with |
 |---|---|
@@ -218,8 +289,8 @@ that key should never be this one.
 > Not every file on disk is reproducible. Twenty categories of artifact exist that no
 > current script produces — earlier script versions wrote them, or a human ran the command
 > by hand. They are catalogued in the
-> [provenance reference](https://rshrj.github.io/r-distro/#stranded) rather than quietly
-> implied reproducible.
+> [provenance reference](https://rshrj.github.io/r-distro/provenance.html#stranded) rather
+> than quietly implied reproducible.
 
 ## License
 

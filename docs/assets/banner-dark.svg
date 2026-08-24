@@ -4,8 +4,8 @@
 
   <text x="88" y="106" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="13" letter-spacing="2.6" fill="#949DAA">DEBIAN FORKY &#183; ARM64 &#183; SNAPSHOT 20260813T165000Z</text>
   <text x="88" y="184" font-family="Georgia, Times New Roman, serif" font-size="70" fill="#E5E9EE">R-Distro</text>
-  <text x="88" y="228" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">Rebuilding the base system from source &#8212; and measuring</text>
-  <text x="88" y="254" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">where self-hosting closes.</text>
+  <text x="88" y="228" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">An independently built Debian derivative &#8212;</text>
+  <text x="88" y="254" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#949DAA">rebuilt from source, signed, and owned end to end.</text>
 
   <g font-family="Menlo, DejaVu Sans Mono, monospace" font-size="15">
     <rect x="800" y="124" width="108" height="38" rx="4" fill="#15191F" stroke="#2A313A"/>
