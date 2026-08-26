@@ -820,7 +820,10 @@ def claim_job(
             )
 
         sql += """
-            ORDER BY attempts ASC, source ASC
+            ORDER BY
+                CASE WHEN status = 'RETRY' THEN 0 ELSE 1 END,
+                attempts ASC,
+                source ASC
             LIMIT 1
         """
 
