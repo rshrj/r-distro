@@ -21,6 +21,39 @@ if [ -f "$POLICY_FILE" ]; then
     source "$POLICY_FILE"
 fi
 
+strip_build_option() {
+    local value="$1"
+    local remove="$2"
+    local word
+    local result=""
+
+    for word in $value; do
+        if [[ "$word" != "$remove" ]]; then
+            result+="${result:+ }$word"
+        fi
+    done
+
+    printf '%s' "$result"
+}
+
+NODOC_INCOMPATIBLE="$ROOT/config/package-policy/nodoc-incompatible.txt"
+
+if [[ -f "$NODOC_INCOMPATIBLE" ]] &&
+   grep -Fxq -- "$PKG" "$NODOC_INCOMPATIBLE"; then
+
+    DEB_BUILD_OPTIONS="$(
+        strip_build_option "$DEB_BUILD_OPTIONS" nodoc
+    )"
+
+    DEB_BUILD_PROFILES="$(
+        strip_build_option "$DEB_BUILD_PROFILES" nodoc
+    )"
+
+    echo "Package policy: $PKG is nodoc-incompatible"
+    echo "  DEB_BUILD_OPTIONS=$DEB_BUILD_OPTIONS"
+    echo "  DEB_BUILD_PROFILES=$DEB_BUILD_PROFILES"
+fi
+
 mkdir -p "$OUT"
 rm -rf "$OUT"/*
 
