@@ -1,0 +1,6 @@
+architecture=arm64
+build=20260812-01:21
+url=https://d-i.debian.org/daily-images/arm64/20260812-01:21/
+sha256sums_sha256=8f04b253dd110992c666794bb8d91af44789b17bed43ca6100228e819913503f
+debian_snapshot=20260813T165000Z
+kernel_udeb_version=7.1.7-1

@@ -1,0 +1,8 @@
+d-i mirror/country string manual
+d-i mirror/protocol string http
+d-i mirror/http/hostname string snapshot.debian.org
+d-i mirror/http/directory string /archive/debian/20260813T165000Z
+d-i mirror/http/proxy string
+
+d-i mirror/suite string forky
+d-i mirror/udeb/suite string forky

@@ -1,0 +1,7 @@
+rdistro-minimal
+busybox
+zstd
+initramfs-tools
+linux-image-arm64
+grub-efi-arm64
+efibootmgr
