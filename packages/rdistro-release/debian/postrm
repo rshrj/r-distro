@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|purge)
+        if [ -L /etc/dpkg/origins/default ]; then
+            target="$(readlink /etc/dpkg/origins/default || true)"
+
+            case "$target" in
+                r-distro|/etc/dpkg/origins/r-distro)
+                    ln -sfn debian /etc/dpkg/origins/default
+                    ;;
+            esac
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

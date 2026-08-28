@@ -1,0 +1,5 @@
+rdistro-release (0.1.1) unstable; urgency=medium
+
+  * Correct dpkg origin filename for the R-Distro vendor.
+
+ -- R-Distro Project <packages@rdistro.invalid>  Wed, 26 Aug 2026 12:00:00 +0200

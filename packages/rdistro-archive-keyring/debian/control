@@ -1,0 +1,15 @@
+Source: rdistro-archive-keyring
+Section: misc
+Priority: important
+Maintainer: R-Distro Project <packages@rdistro.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: rdistro-archive-keyring
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: R-Distro archive signing keys
+ Contains the public signing key used to authenticate packages
+ published by the official R-Distro APT archive.

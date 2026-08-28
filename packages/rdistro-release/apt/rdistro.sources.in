@@ -1,0 +1,6 @@
+Types: deb
+URIs: @RDISTRO_REPO_URL@
+Suites: @RDISTRO_SUITE@
+Components: main
+Architectures: arm64
+Signed-By: /usr/share/keyrings/rdistro-archive-keyring.asc

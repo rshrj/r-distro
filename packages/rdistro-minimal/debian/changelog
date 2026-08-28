@@ -1,0 +1,5 @@
+rdistro-minimal (0.1) unstable; urgency=medium
+
+  * Initial R-Distro minimal system metapackage.
+
+ -- R-Distro Project <packages@rdistro.invalid>  Wed, 26 Aug 2026 14:25:00 +0200

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        mkdir -p /etc/dpkg/origins
+        ln -sfn r-distro /etc/dpkg/origins/default
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

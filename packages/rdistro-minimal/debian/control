@@ -1,0 +1,25 @@
+Source: rdistro-minimal
+Section: metapackages
+Priority: important
+Maintainer: R-Distro Project <packages@rdistro.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: rdistro-minimal
+Architecture: arm64
+Depends:
+ rdistro-release (>= 0.1.1),
+ linux-image-arm64,
+ systemd-sysv,
+ apt,
+ ca-certificates,
+ ifupdown,
+ iproute2,
+ iputils-ping,
+ procps,
+ ${misc:Depends}
+Description: Minimal R-Distro system
+ Defines the minimum supported ARM64 R-Distro installation.
+ This package depends on the core operating system, networking,
+ package-management, and R-Distro identity components.

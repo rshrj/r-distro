@@ -1,0 +1,9 @@
+NAME="R-Distro"
+PRETTY_NAME="R-Distro 0.1 (development)"
+ID=rdistro
+ID_LIKE=debian
+VERSION="0.1 (development)"
+VERSION_ID="0.1"
+VERSION_CODENAME=development
+DEBIAN_BASE_SUITE=forky
+DEBIAN_SNAPSHOT=20260813T165000Z

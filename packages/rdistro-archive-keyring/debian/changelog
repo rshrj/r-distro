@@ -1,0 +1,5 @@
+rdistro-archive-keyring (2026.08.26) unstable; urgency=medium
+
+  * Initial R-Distro archive keyring package.
+
+ -- R-Distro Project <packages@rdistro.invalid>  Wed, 26 Aug 2026 10:45:00 +0200

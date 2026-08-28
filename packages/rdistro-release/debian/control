@@ -1,0 +1,17 @@
+Source: rdistro-release
+Section: admin
+Priority: important
+Maintainer: R-Distro Project <packages@rdistro.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: rdistro-release
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ rdistro-archive-keyring (>= 2026.08.26),
+ ${misc:Depends}
+Description: R-Distro release metadata and distribution identity
+ Provides R-Distro release metadata, dpkg vendor information, and
+ repository configuration templates for installed R-Distro systems.

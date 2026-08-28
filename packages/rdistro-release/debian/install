@@ -1,0 +1,3 @@
+release usr/lib/rdistro/
+origins/r-distro etc/dpkg/origins/
+apt/rdistro.sources.in usr/share/rdistro/apt/
