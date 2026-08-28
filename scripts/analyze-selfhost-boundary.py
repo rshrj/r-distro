@@ -1374,6 +1374,221 @@ def sha256_file(
     return h.hexdigest()
 
 
+def explain_why_source(
+    target: str,
+    required_sources,
+    base_source_set,
+    seed_rows,
+    build_edges,
+    runtime_edges,
+):
+    """
+    Print one shortest dependency chain explaining why TARGET
+    is inside the self-hosting source boundary.
+
+    Direction here is:
+        requiring source -> required source
+    """
+
+    if target not in required_sources:
+        print()
+        print(
+            f"{target!r} is not in the self-hosting boundary."
+        )
+        return
+
+    # --------------------------------------------------------------
+    # Boundary roots / seeds.
+    # --------------------------------------------------------------
+
+    root_reasons = defaultdict(list)
+
+    for source in sorted(base_source_set):
+        if source in required_sources:
+            root_reasons[source].append(
+                "base source target"
+            )
+
+    for row in seed_rows:
+        source = row["source"]
+
+        if source in required_sources:
+            root_reasons[source].append(
+                f"binary seed {row['binary']} "
+                f"({row['reasons']})"
+            )
+
+    # --------------------------------------------------------------
+    # Requirement graph:
+    #
+    # consumer source -> provider source
+    #
+    # Note that the SCC graph later in this script deliberately uses
+    # the opposite orientation (provider -> consumer).
+    # --------------------------------------------------------------
+
+    graph = defaultdict(list)
+    required_by = defaultdict(list)
+
+    for edge in build_edges:
+        consumer = edge["consumer_source"]
+        provider = edge["provider_source"]
+
+        detail = (
+            f"{edge['field']}: "
+            f"{edge['selected_alternative']} "
+            f"-> {edge['binary_dependency']}"
+        )
+
+        graph[consumer].append(
+            (provider, detail)
+        )
+
+        required_by[provider].append(
+            (consumer, detail)
+        )
+
+    for edge in runtime_edges:
+        consumer = edge["consumer_source"]
+        provider = edge["provider_source"]
+
+        detail = (
+            f"{edge['consumer_binary']} "
+            f"{edge['field']}: "
+            f"{edge['selected_alternative']} "
+            f"-> {edge['provider_binary']}"
+        )
+
+        graph[consumer].append(
+            (provider, detail)
+        )
+
+        required_by[provider].append(
+            (consumer, detail)
+        )
+
+    # --------------------------------------------------------------
+    # BFS from every seed. This gives one shortest explanation and
+    # cannot loop forever inside the large SCC.
+    # --------------------------------------------------------------
+
+    roots = sorted(root_reasons)
+
+    queue = deque(roots)
+
+    previous = {
+        root: None
+        for root in roots
+    }
+
+    while queue:
+        current = queue.popleft()
+
+        if current == target:
+            break
+
+        for child, detail in sorted(
+            graph.get(current, []),
+            key=lambda x: (x[0], x[1]),
+        ):
+            if child not in required_sources:
+                continue
+
+            if child in previous:
+                continue
+
+            previous[child] = (
+                current,
+                detail,
+            )
+
+            queue.append(child)
+
+    print()
+    print("========================================")
+    print(f" WHY {target}")
+    print("========================================")
+    print()
+
+    if target not in previous:
+        print(
+            "No path from a recorded boundary seed was found."
+        )
+        return
+
+    # --------------------------------------------------------------
+    # Reconstruct path.
+    # --------------------------------------------------------------
+
+    path = []
+
+    node = target
+
+    while previous[node] is not None:
+        parent, detail = previous[node]
+
+        path.append(
+            (
+                parent,
+                node,
+                detail,
+            )
+        )
+
+        node = parent
+
+    root = node
+
+    path.reverse()
+
+    print(f"Seed source: {root}")
+
+    for reason in sorted(
+        set(root_reasons[root])
+    ):
+        print(f"  seed reason: {reason}")
+
+    print()
+
+    if not path:
+        print(
+            f"{target} is itself a boundary seed."
+        )
+    else:
+        print(root)
+
+        for parent, child, detail in path:
+            print(
+                f"  -> {child}"
+            )
+            print(
+                f"     [{detail}]"
+            )
+
+    # --------------------------------------------------------------
+    # Also answer the immediate "what needs it?" question.
+    # --------------------------------------------------------------
+
+    incoming = sorted(
+        set(required_by.get(target, [])),
+        key=lambda x: (x[0], x[1]),
+    )
+
+    print()
+    print("Directly required by:")
+
+    if not incoming:
+        print("  (none; it is a seed)")
+    else:
+        for consumer, detail in incoming:
+            print(
+                f"  {consumer}"
+            )
+            print(
+                f"    [{detail}]"
+            )
+
+
 # ======================================================================
 # Main
 # ======================================================================
@@ -1400,6 +1615,15 @@ def main():
     parser.add_argument(
         "--no-render",
         action="store_true",
+    )
+
+    parser.add_argument(
+        "--why",
+        metavar="SOURCE",
+        help=(
+            "Explain why a source package is in "
+            "the self-hosting boundary."
+        ),
     )
 
     args = parser.parse_args()
@@ -3118,6 +3342,16 @@ explicit boundary chosen for rebuilding the ARM64 R-Distro base system.
     print(
         f"  {out / 'BOUNDARY.md'}"
     )
+    
+    if args.why:
+        explain_why_source(
+            args.why,
+            required_sources,
+            base_source_set,
+            seed_rows,
+            build_edges,
+            runtime_edges,
+        )
 
     if unresolved:
 
