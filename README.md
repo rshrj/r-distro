@@ -17,7 +17,8 @@
 <p align="center">
   <b><a href="https://rshrj.github.io/r-distro/">Documentation</a></b> &nbsp;·&nbsp;
   <a href="https://rshrj.github.io/r-distro/#roadmap">Roadmap</a> &nbsp;·&nbsp;
-  <a href="https://rshrj.github.io/r-distro/provenance.html">Artifact provenance</a>
+  <a href="https://rshrj.github.io/r-distro/provenance.html">Artifact provenance</a> &nbsp;·&nbsp;
+  <a href="docs/native-package-walkthrough.md">Native packages</a>
 </p>
 
 ---
@@ -119,7 +120,9 @@ carries the detail and the evidence for each claim.
 versioning · package build policy as data · signed APT archive · dependency closure
 analysis from both observed *and* declared metadata · deterministic self-hosting boundary ·
 durable campaign controller with immutable attempts and failure classification · validated
-immutable release promotion · per-build provenance measurement.
+immutable release promotion · per-build provenance measurement · **distribution identity**
+(dpkg vendor, archive keyring, minimal metapackage) · **a source workspace** for authoring
+local patches and native packages.
 
 **Next** — the gap between a pinned rebuild and a rolling distribution:
 
@@ -129,13 +132,17 @@ immutable release promotion · per-build provenance measurement.
 - **Snapshot diff → changed-source manifest.** The missing primitive, and the cheapest —
   `Sources` index parsing, not compute. Feeds the existing `rdistroctl plan --manifest`
   unchanged.
-- **Patch injection.** No mechanism exists yet. Natural home is `patches/<source>/`,
-  applied where `PRE_BUILD_COMMAND` already hooks in.
+- **Wire overrides into the build.** Patches can now be authored and saved to
+  `overrides/<source>/patches/`, but **nothing in the campaign path reads them** — a
+  campaign build still rebuilds the unmodified Debian source and reports nothing unusual.
+  `build-package.sh` already has the `PRE_BUILD_COMMAND` hook to apply them at.
 - **Patch rebase detection.** Notice when a local patch stops applying or lands upstream,
   and drop it. This is what makes it a system rather than a pile of diffs.
+- **Build the image.** The simple-cdd configuration and the pinned debian-installer
+  manifest are in `image/`; no ISO has been produced from them yet.
 
 **Planned** — test gating (`autopkgtest` and `sbuild` ship in the controller image but are
-not yet invoked) · explicit hybrid-archive policy · image composition to an ISO.
+not yet invoked) · explicit hybrid-archive policy.
 
 ## Status
 
@@ -143,8 +150,8 @@ not yet invoked) · explicit hybrid-archive policy · image composition to an IS
   [`manifests/selfhost-canary-arm64.txt`](manifests/selfhost-canary-arm64.txt) rebuilt
   clean: 1061 signed artifacts, including the full toolchain, the kernel, and the packaging
   tools that build everything else.
-- **`gen3-bootstrap`** — in progress across the full 4725-source boundary; 2054 sources
-  rebuilt so far.
+- **`gen3-bootstrap`** — in progress across the full 4725-source boundary; 2732 sources
+  rebuilt so far, 55 failing, 3066 attempts recorded.
 
 ## Quick start
 
@@ -176,6 +183,27 @@ DEB_BUILD_PROFILES="nocheck"
 # config/package-policy/linux.env — the kernel generates its own control file
 PRE_BUILD_COMMAND='make -f debian/rules debian/control-real'
 ```
+
+Fifty-five sources cannot build under `nodoc` at all — their `debian/install` names
+documentation the build was told not to generate. They are listed once in
+`config/package-policy/nodoc-incompatible.txt` rather than getting a file each.
+
+To carry a local change to a Debian source, or to add a package of your own:
+
+```sh
+# Edit a pinned Debian source in a git-backed workspace
+scripts/rdistroctl.py source-edit hello      # work/edit/hello, first commit = pristine
+scripts/rdistroctl.py source-save hello      # -> overrides/hello/patches/ (quilt series)
+scripts/rdistroctl.py source-shell hello     # build it with the patches applied
+
+# Scaffold a native package
+scripts/rdistroctl.py package-new my-tool    # -> packages/my-tool/
+```
+
+> [!IMPORTANT]
+> Overrides are **not yet read by campaign builds**. `rdistroctl run` still rebuilds the
+> unmodified pinned source and succeeds without mentioning it. `source-shell` is currently
+> the only path that applies them.
 
 ### Running a campaign
 
@@ -229,6 +257,9 @@ brute force — and both were forced by the constraint.
   generated artifact traced back to the exact command that produces it, plus a from-scratch
   runbook and the twenty artifacts on disk that **no current script can produce any more**.
   Also available as [Markdown](docs/GENERATED-ARTIFACTS.md).
+- [**Native package walkthrough**](docs/native-package-walkthrough.md) — the full round
+  trip for an R-Distro native package: build, publish to a development archive, install,
+  and verify the distribution identity took effect.
 
 ## Layout
 
@@ -238,10 +269,21 @@ buildroot/      unprivileged build image; BASE_IMAGE is parameterised so
                 later generations build inside an R-Distro base
 controller/     orchestration image (sbuild, autopkgtest, docker-cli)
 
+image/          simple-cdd installer image build; the mirror is preseeded to
+                the same pinned snapshot, so the ISO inherits the pin
+
 config/package-policy/    per-package build exceptions, as data
+                          (.env per package, plus the nodoc exemption list)
+
+packages/       R-Distro's own native packages - release metadata and the
+                dpkg vendor, the archive keyring, the minimal metapackage
+overrides/      local patches over pinned Debian sources, quilt series
+                (created by source-save; not yet read by campaign builds)
 
 manifests/
   2026-08-13/             pinned snapshot and bootstrap image digests
+  debian-installer-arm64.txt
+                          pinned d-i daily build for the installer image
   base-sources.txt        the 49-source base set (curated)
   bootstrap-frontier-common.txt
                           52 packages at the edge of the closure (curated)
@@ -263,13 +305,16 @@ scripts/
   analyze-selfhost-boundary.py  the boundary fixed point
   rdistroctl.py                 campaign controller
   rdistro_repo.py               validate / stage / promote releases
+  rdistro_source.py             source workspace: edit, save, build, scaffold
   retry-fetch-failures.py       requeue transient snapshot fetch failures
+  buildwatch.py                 terminal progress bar for a running build
+  buildactivity.swift           the same, as a macOS menu-bar item
 ```
 
 ## What is not in this repository
 
 Git holds source, configuration, policy, documentation and frozen input definitions. It does
-not hold anything the tracked scripts can produce, which is roughly **31 GB** of build
+not hold anything the tracked scripts can produce, which is roughly **51 GB** of build
 roots, APT pools, analysis dumps and logs.
 
 | Untracked | Regenerate with |

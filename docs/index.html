@@ -28,7 +28,7 @@
     <p class="hero-sub">The tooling here pins Debian to an exact snapshot, rebuilds its ARM64 base from source, and publishes each pass as an immutable signed archive that the next pass builds against. The destination is a rolling system that tracks Debian testing continuously, carries local patches across each advance, and composes the result into images for a fleet.</p>
     <div class="masthead-meta">
       <span>Boundary <b>4725 sources</b></span>
-      <span>Rebuilt so far <b>2054</b></span>
+      <span>Rebuilt so far <b>2732</b></span>
       <span>Releases <b>1 promoted</b></span>
       <span>Built on <b>one laptop</b></span>
     </div>
@@ -92,7 +92,7 @@
       <p>The target architecture is a cycle. Roughly half of it exists today; the diagram distinguishes the two, so it doubles as an honest statement of progress.</p>
 
       <figure>
-        <svg viewBox="0 0 820 512" role="img" aria-label="The R-Distro cycle. Built today: build, validate and promote, signed release, and the feedback arrow by which each signed release becomes the base for the next generation's builds. Not yet built: snapshot diff, changed-source selection, patch rebase with local patch injection, and image composition into an ISO for a fleet.">
+        <svg viewBox="0 0 820 512" role="img" aria-label="The R-Distro cycle. Built today: local patch injection, build, validate and promote, signed release, and the feedback arrow by which each signed release becomes the base for the next generation's builds. Configured but not yet proven: image composition into an ISO for a fleet. Not yet built: snapshot diff, changed-source selection, and patch rebase.">
           <defs>
             <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
@@ -116,8 +116,9 @@
           <rect x="56" y="314" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55"></rect>
           <text x="154" y="345" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" fill="currentColor" opacity="0.62">patch rebase</text>
 
-          <rect x="56" y="402" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55"></rect>
-          <text x="154" y="433" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" fill="currentColor" opacity="0.62">your patches</text>
+          <rect x="56" y="402" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
+          <text x="154" y="426" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" font-weight="500" fill="currentColor">your patches</text>
+          <text x="154" y="443" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.68">overrides/ · packages/</text>
 
           <!-- right column: built -->
           <rect x="468" y="138" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
@@ -132,17 +133,17 @@
           <text x="566" y="338" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" font-weight="500" fill="#C4623C">signed release</text>
           <text x="566" y="355" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="#C4623C">generation N</text>
 
-          <rect x="468" y="402" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55"></rect>
-          <text x="566" y="426" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" fill="currentColor" opacity="0.62">ISO / image</text>
-          <text x="566" y="443" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.52">for a fleet</text>
+          <rect x="468" y="402" width="196" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-dasharray="1 3" opacity="0.75"></rect>
+          <text x="566" y="426" text-anchor="middle" font-family="Fira Mono, Menlo, monospace" font-size="12.5" fill="currentColor" opacity="0.82">ISO / image</text>
+          <text x="566" y="443" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.62">configured, not built</text>
 
           <!-- left column flow -->
           <line x1="154" y1="102" x2="154" y2="130" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></line>
           <text x="166" y="122" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.55">when the pin advances</text>
           <line x1="154" y1="190" x2="154" y2="218" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></line>
           <line x1="154" y1="278" x2="154" y2="306" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></line>
-          <line x1="154" y1="402" x2="154" y2="374" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></line>
-          <text x="166" y="392" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.55">inject</text>
+          <line x1="154" y1="402" x2="154" y2="374" stroke="currentColor" stroke-width="1.25" marker-end="url(#a1)"></line>
+          <text x="166" y="392" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.72">inject</text>
 
           <!-- patch rebase -> build -->
           <path d="M 252 340 L 360 340 L 360 164 L 460 164" fill="none" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></path>
@@ -152,8 +153,8 @@
           <!-- right column flow -->
           <line x1="566" y1="190" x2="566" y2="218" stroke="currentColor" stroke-width="1.25" marker-end="url(#a1)"></line>
           <line x1="566" y1="278" x2="566" y2="306" stroke="currentColor" stroke-width="1.25" marker-end="url(#a1)"></line>
-          <line x1="566" y1="366" x2="566" y2="394" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55" marker-end="url(#a1)"></line>
-          <text x="578" y="386" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.55">compose</text>
+          <line x1="566" y1="366" x2="566" y2="394" stroke="currentColor" stroke-width="1.25" stroke-dasharray="1 3" opacity="0.75" marker-end="url(#a1)"></line>
+          <text x="578" y="386" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11" fill="currentColor" opacity="0.62">compose</text>
 
           <!-- feedback: signed release -> build -->
           <path d="M 664 340 L 744 340 L 744 164 L 672 164" fill="none" stroke="#C4623C" stroke-width="1.5" marker-end="url(#a2)"></path>
@@ -163,10 +164,12 @@
           <!-- legend -->
           <line x1="56" y1="486" x2="86" y2="486" stroke="currentColor" stroke-width="1.25"></line>
           <text x="94" y="490" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="currentColor" opacity="0.72">built today</text>
-          <line x1="186" y1="486" x2="216" y2="486" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55"></line>
-          <text x="224" y="490" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="currentColor" opacity="0.55">not yet built</text>
+          <line x1="186" y1="486" x2="216" y2="486" stroke="currentColor" stroke-width="1.25" stroke-dasharray="1 3" opacity="0.75"></line>
+          <text x="224" y="490" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="currentColor" opacity="0.62">configured, unproven</text>
+          <line x1="360" y1="486" x2="390" y2="486" stroke="currentColor" stroke-width="1.25" stroke-dasharray="5 4" opacity="0.55"></line>
+          <text x="398" y="490" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="currentColor" opacity="0.55">not yet built</text>
         </svg>
-        <figcaption>The right-hand column — build, validate, promote, and the rust feedback arrow that makes each signed release the base for the next generation — works today. The left-hand column is the part that turns a pinned rebuild into a rolling distribution, and none of it exists yet.</figcaption>
+        <figcaption>The right-hand column — build, validate, promote, and the rust feedback arrow that makes each signed release the base for the next generation — works today, and so does patch injection at the bottom left: local changes have somewhere to live. What is still missing is everything that would make the loop <em>advance on its own</em> — diffing a new snapshot, selecting what changed, and rebasing patches onto it. Image composition is configured but has not yet produced an ISO.</figcaption>
       </figure>
     </section>
 
@@ -189,6 +192,8 @@
           <li><b>Durable campaign controller</b><span>SQLite job state, immutable numbered attempts, parallel workers, pause/resume, failure classification from build logs.</span></li>
           <li><b>Validated immutable promotion</b><span><code>validate</code> → <code>stage</code> → <code>promote</code>, finishing with an atomic rename so a release is never half-published.</span></li>
           <li><b>Per-build provenance measurement</b><span>Every build records how many of its dependencies came from R-Distro versus Debian. Self-hosting is the state where the Debian count reaches zero.</span></li>
+          <li><b>Distribution identity</b><span>Three native packages of R-Distro's own: a dpkg vendor declaring Debian as parent, the archive keyring installed systems verify against, and a metapackage defining the minimum supported install. An installed machine reports <code>R-Distro</code> to <code>dpkg-vendor</code> and records the snapshot it descends from.</span></li>
+          <li><b>A source workspace for local changes</b><span>Every source has an origin derived from the filesystem — native, Debian plus overrides, or plain Debian. <code>source-edit</code> gives a git tree whose first commit is the pristine upstream state, and <code>source-save</code> writes the delta back as a quilt series. Not yet read by campaign builds; see Next.</span></li>
         </ul>
       </div>
 
@@ -200,8 +205,9 @@
         <ul class="rm-list">
           <li><b>Parameterise the pin</b><span>The snapshot is hardcoded in all three Dockerfiles and the date is baked into image tags across seven tracked files. Meanwhile <code>manifests/2026-08-13/bootstrap-snapshot.txt</code> declares the pin as data and nothing reads it. Advancing the snapshot today means hand-editing about ten places.</span></li>
           <li><b>Snapshot diff → changed-source manifest</b><span>The missing primitive, and the cheapest one: it is <code>Sources</code> index parsing, not compute. It feeds the existing <code>rdistroctl plan --manifest</code> unchanged, so the whole build path is reused.</span></li>
-          <li><b>Patch injection</b><span>No mechanism exists yet. The natural home is <code>patches/&lt;source&gt;/</code>, applied after <code>apt-get source</code> and before <code>dpkg-source -b</code> — exactly where <code>PRE_BUILD_COMMAND</code> already hooks in.</span></li>
+          <li><b>Wire overrides into the build</b><span>Patches can be authored and saved to <code>overrides/&lt;source&gt;/patches/</code>, but nothing in the campaign path reads them: neither <code>build-package.sh</code> nor <code>rdistroctl.py</code> references the directory, so <code>rdistroctl run</code> rebuilds the unmodified source, succeeds, and reports nothing unusual. The hook to apply them at already exists — <code>PRE_BUILD_COMMAND</code> runs in the source tree after <code>apt-get source</code> and before the build.</span></li>
           <li><b>Patch rebase detection</b><span>The part that makes it a system rather than a pile of diffs: notice when a local patch stops applying or has landed upstream, and drop it.</span></li>
+          <li><b>Build the image</b><span>The simple-cdd configuration, the profile and the pinned debian-installer manifest are in <code>image/</code>, with the installer's mirror preseeded to the same snapshot everything else builds against. No ISO has been produced from it yet.</span></li>
         </ul>
       </div>
 
@@ -213,7 +219,7 @@
         <ul class="rm-list">
           <li><b>Test gating</b><span><code>autopkgtest</code> and <code>sbuild</code> are installed in the controller image but are not invoked by any script. Gating an advance on tests is what makes rolling safe.</span></li>
           <li><b>Explicit hybrid-archive policy</b><span>A declared split between packages R-Distro rebuilds and packages it deliberately passes through to Debian. This already works implicitly through version ordering; it should be a stated policy, not an accident.</span></li>
-          <li><b>Image composition</b><span>Bootstrap an installable image from R-Distro's own signed archive. Shorter than it looks — a promoted release is already exactly what <code>debootstrap</code> consumes.</span></li>
+          <li><b>Install from R-Distro's own archive</b><span>The installer image currently preseeds Debian's pinned snapshot as its mirror. Pointing it at a promoted R-Distro release instead is what makes the ISO genuinely R-Distro's rather than Debian's with extra packages.</span></li>
         </ul>
       </div>
     </section>
@@ -230,7 +236,7 @@
 
     <section id="status">
       <h2 class="sec">Status</h2>
-      <p>A point-in-time snapshot, read from the controller database on 2026-08-24.</p>
+      <p>A point-in-time snapshot, read from the controller database on 2026-08-28.</p>
 
       <h3>Releases</h3>
       <div class="tw"><table>
@@ -241,14 +247,14 @@
 
       <h3>Campaign <code>gen3-bootstrap</code> — generation 3, 4725 sources</h3>
       <div class="stats">
-        <div class="stat"><p class="k">Succeeded</p><p class="v ok">2054</p></div>
-        <div class="stat"><p class="k">Pending</p><p class="v dim">2404</p></div>
-        <div class="stat"><p class="k">Retry</p><p class="v warn">188</p></div>
-        <div class="stat"><p class="k">Failed</p><p class="v">75</p></div>
-        <div class="stat"><p class="k">Building</p><p class="v dim">4</p></div>
-        <div class="stat"><p class="k">Attempts</p><p class="v dim">2337</p></div>
+        <div class="stat"><p class="k">Succeeded</p><p class="v ok">2732</p></div>
+        <div class="stat"><p class="k">Pending</p><p class="v dim">1931</p></div>
+        <div class="stat"><p class="k">Failed</p><p class="v">55</p></div>
+        <div class="stat"><p class="k">Building</p><p class="v dim">7</p></div>
+        <div class="stat"><p class="k">Attempts</p><p class="v dim">3066</p></div>
       </div>
-      <p>Of the 75 current failures, 65 are transient fetch errors against <code>snapshot.debian.org</code> rather than genuine build problems; 7 are test failures and 3 are compile errors. That ratio is itself a finding — at this scale the network is a bigger adversary than the code.</p>
+      <p>The 55 current failures are 19 <code>docs</code>, 16 <code>compile</code>, 12 <code>source-fetch</code>, 5 <code>unknown</code>, 2 <code>configure</code> and 1 <code>tests</code>.</p>
+      <p>That <code>docs</code> now leads is a change in the classifier rather than in what fails. These were previously spread across <code>unknown</code> and an over-broad <code>source-fetch</code> that also matched every transient network error. They are packages whose <code>debian/install</code> names documentation that <code>nodoc</code> prevented from being generated — a policy problem, not a broken build, and the exemption list exists to retire them.</p>
     </section>
 
     <section id="docs">
@@ -258,12 +264,16 @@
           <p class="ct">Artifact Provenance →</p>
           <p class="cd">Every generated artifact traced back to the command that produces it, stage by stage — plus a from-scratch runbook and the twenty artifacts on disk that no current script can produce.</p>
         </a>
+        <a class="card" href="https://github.com/rshrj/r-distro/blob/main/docs/native-package-walkthrough.md">
+          <p class="ct">Native Packages →</p>
+          <p class="cd">The full round trip for one of R-Distro's own packages: build it in the pinned container, publish it to a development archive, install it, and verify the distribution identity actually took effect.</p>
+        </a>
         <a class="card" href="https://github.com/rshrj/r-distro">
           <p class="ct">Source on GitHub →</p>
           <p class="cd">The tooling itself: build scripts, dependency analysis, the campaign controller and the repository promotion logic. MIT licensed.</p>
         </a>
       </div>
-      <p>The provenance reference exists because roughly 31&nbsp;GB of this project is generated output and only about 470&nbsp;KB is tracked source. Knowing which is which — and which generated files can no longer be regenerated — is a prerequisite for trusting any of it.</p>
+      <p>The provenance reference exists because roughly 51&nbsp;GB of this project is generated output and only about 645&nbsp;KB is tracked source. Knowing which is which — and which generated files can no longer be regenerated — is a prerequisite for trusting any of it.</p>
     </section>
 
   </main>

@@ -16,7 +16,7 @@ importantly, which ones you can no longer reproduce.
 
 Every file in this working tree is either **tracked source** or **generated output**.
 Git holds only the first kind: source, configuration, policy, documentation, and frozen
-input definitions — 36 files, about 470 KB. Everything else, roughly 31 GB, is produced
+input definitions — 77 files, about 645 KB. Everything else, roughly 51 GB, is produced
 by running the tracked scripts.
 
 This document walks each generated artifact back to the exact command that produces it,
@@ -85,7 +85,7 @@ and carrying local patches across each advance. Dotted edges do not exist yet.
 flowchart LR
     A["Debian testing<br/>snapshot N"] -.->|when the pin advances| B["snapshot diff"]
     B -.-> C["changed sources"]
-    P["your patches"] -.->|inject| D["patch rebase"]
+    P["your patches<br/>overrides/ · packages/"] -->|inject| D["patch rebase"]
     C -.-> D
     D -.->|only what changed| E["build"]
     E --> F["validate + promote"]
@@ -96,10 +96,13 @@ flowchart LR
     style E stroke-width:2px
     style F stroke-width:2px
     style G stroke-width:2px
+    style P stroke-width:2px
 ```
 
-Solid edges work today. Everything dotted — snapshot diffing, patch injection, patch
-rebase detection, image composition — is described in the
+Solid edges work today. **Patch injection now exists** — see
+[Stage 9](#stage-9--the-source-workspace) — though the patches it produces are not yet
+read by a campaign build. Everything still dotted — snapshot diffing, patch rebase
+detection, image composition — is described in the
 [roadmap](https://rshrj.github.io/r-distro/#roadmap).
 
 ---
@@ -190,6 +193,14 @@ Package-specific exceptions live in `config/package-policy/<pkg>.env`, sourced
 automatically. Two exist today: `bash.env` drops `nodoc` (the bash build needs its
 documentation targets), and `linux.env` sets a `PRE_BUILD_COMMAND` that regenerates
 `debian/control-real` before `Build-Depends` can be read.
+
+`config/package-policy/nodoc-incompatible.txt` is the same idea as a shared list rather
+than one file per package. It names 55 sources whose `debian/install` or `debian/manpages`
+references a file that only exists when documentation was generated — under `nodoc` the
+build succeeds and `dh_install` then fails on a file it was told not to produce. For any
+source listed, the script removes `nodoc` from both `DEB_BUILD_OPTIONS` and
+`DEB_BUILD_PROFILES` word-wise (so `nocheck` is untouched) and logs that it did, which is
+how the build log records that the exemption applied.
 
 After any `PRE_BUILD_COMMAND` the script sweeps `__pycache__` directories and `*.pyc`
 files from the source tree, so a preparation hook cannot contaminate the source package.
@@ -369,6 +380,7 @@ Debian's cross-toolchain packages are excluded deliberately.
 
 ```sh
 scripts/analyze-selfhost-boundary.py                     # --out defaults to analysis/selfhost-boundary
+scripts/analyze-selfhost-boundary.py --why <source>      # explain one membership
 ```
 
 **Output — SCRIPT** (`analysis/selfhost-boundary/`, 16 files):
@@ -391,6 +403,15 @@ For the pinned snapshot the boundary closes after **14 rounds** at **4725 source
 **7570 binaries**, with **0 unresolved relations** and **0 source-version mismatches** —
 status **VALID**. 187 ambiguous virtual choices are reported rather than silently
 resolved. The SCC condensation is rendered; the full 4711-node graph deliberately is not.
+
+**`--why <source>` — READ-ONLY, no output files.** Prints the shortest chain from a
+recorded boundary seed to the named source, and for each edge the field and the selected
+alternative that pulled it. The alternative matters: the closure resolves alternatives,
+so a chain that does not say which branch was taken cannot be checked. It then lists the
+direct requirers, which answers the different and usually more useful question of what
+would break if the source were dropped. The traversal is breadth-first from all seeds at
+once, because the requirement graph contains one very large strongly connected component
+in which a depth-first walk either loops or returns a chain hundreds of edges long.
 
 ### Promoting the result
 
@@ -476,19 +497,36 @@ and checks the campaign is still `RUNNING`, so `pause` takes effect between jobs
 
 #### Failure classification
 
-Failures are classified from the **last 300 KB** of the build log, first pattern wins:
+Failures are classified from the **last 300 KB** of the build log. One heuristic runs
+first, then patterns in order, first match wins:
 
 | Category | Triggered by |
 |---|---|
+| `docs` | **heuristic, checked first:** a path under `/usr/share/doc`, `/usr/share/man`, `target/apidocs` or `debian/doc/html` appearing together with a missing-file error |
 | `disk` | `no space left on device` |
 | `oom` | `out of memory`, `cannot allocate memory`, `oom-kill` |
 | `dependency` | `unmet dependencies`, `not installable`, `mk-build-deps: unable`, … |
-| `source-fetch` | `failed to fetch`, `unable to find a source package`, … |
-| `tests` | `dh_auto_test`, `tests failed`, `failures!!!`, … |
+| `network` | `could not resolve`, `temporary failure resolving`, `connection timed out`, … |
+| `source-fetch` | `unable to find a source package`, `can not find version`, … |
+| `docs` | `dh_doxygen: error:`, `unable to load addon sphinxdoc`, `pandoc: no such file`, `tex: command not found`, … |
+| `tests` | `dh_auto_test: error:`, `tests failed`, `failures!!!`, … |
 | `configure` | `configure: error:`, `cmake error`, `meson.build:` |
+| `packaging` | `dh_install: error:`, `dh_missing: error:`, `dh_installdocs: error:`, … |
 | `docker` | `cannot connect to the docker daemon`, `error response from daemon`, … |
 | `compile` | fallback: log contains `error:`, or `make` and `***` |
 | `unknown` | fallback: nothing matched, or the log could not be read |
+
+The `docs` heuristic runs ahead of the pattern list because the common case does not name
+a tool. A package built with `nodoc` skips generating a manpage, `dh_install` then fails
+to find it, and the log says only that a path does not exist — pairing a documentation
+path with a missing-file error catches those, and the ones it catches are exactly the
+packages that belong in `config/package-policy/nodoc-incompatible.txt`.
+
+`network` is separated from `source-fetch` because the two want different responses: a
+transient DNS or connection failure should be retried, a source genuinely absent from the
+pinned snapshot should not. Patterns that fire on ordinary successful output are
+deliberately absent — a bare `dh_auto_test` appears in the sequence listing of every
+build that runs tests, and `apt-get source` in every build that reaches the fetch step.
 
 `scripts/retry-fetch-failures.py` is the narrow companion: it re-queues only jobs whose
 logs show transient network failures against `snapshot.debian.org`, leaving genuine build
@@ -552,6 +590,119 @@ existing release is refused.
 
 ---
 
+## Stage 9 — The source workspace
+
+### `scripts/rdistro_source.py`
+
+Registered into `rdistroctl.py` as seven subcommands. This is where local changes to a
+source live, and it is the mechanism by which R-Distro carries anything of its own.
+
+Every source has an **origin**, derived from the filesystem rather than declared in a
+list that could drift:
+
+| Origin | Condition | Meaning |
+|---|---|---|
+| `native` | `packages/<src>/` exists | R-Distro's own package, no Debian counterpart |
+| `debian+override` | `overrides/<src>/` exists | Pinned Debian source plus local patches |
+| `debian` | neither | Rebuilt unmodified |
+
+```sh
+python3 scripts/rdistroctl.py source-origin <src>     # which of the three
+python3 scripts/rdistroctl.py source-edit   <src>     # fetch + apply patches + git init
+python3 scripts/rdistroctl.py source-status <src>     # what changed against the baseline
+python3 scripts/rdistroctl.py source-save   <src>     # write patches back out
+python3 scripts/rdistroctl.py source-shell  <src>     # build the edited tree
+python3 scripts/rdistroctl.py source-discard <src>    # drop the workspace
+python3 scripts/rdistroctl.py package-new   <src>     # scaffold a native package
+```
+
+**`source-edit` — SCRIPT:** `work/edit/<src>/`. Fetches the pinned Debian source, applies
+any existing override series, and initialises a git repository whose **first commit is the
+pristine upstream state**. Editing is then ordinary git work, and the diff against that
+first commit is by construction exactly the local delta.
+
+**Output — SCRIPT** (`work/edit/<src>/`, ignored — build tree):
+
+| Path | Meaning |
+|---|---|
+| `.git/` | Baseline commit + your work |
+| `.rdistro-edit.json` | Source, version, origin, and the override digest it was applied from |
+| *(source tree)* | The extracted and patched Debian source |
+
+**`source-save` — SCRIPT:** `overrides/<src>/patches/`, **tracked**. Diffs the working
+tree against the baseline commit and writes a quilt-style series — numbered `.patch` files
+plus a `series` file. That format is what Debian tooling already understands, so the
+patches stay legible to anyone who has packaged before and stay usable if this tooling
+goes away.
+
+**Output — SCRIPT** (`overrides/<src>/`, tracked):
+
+| Path | Meaning |
+|---|---|
+| `patches/series` | Ordered patch list, quilt format |
+| `patches/NNNN-<slug>.patch` | One change |
+
+**`package-new` — SCRIPT:** `packages/<src>/`, **tracked**. Scaffolds `debian/control`,
+`changelog`, `rules` (mode 755) and `source/format` set to `3.0 (native)`, plus a README.
+Templated rather than copied from an existing package, so a new package does not inherit
+another's dependencies by accident.
+
+Baselines are checked rather than trusted: the metadata records a digest of the patch set
+the tree was built from, so a workspace built against a stale series is detected instead
+of silently producing something that matches neither.
+
+> ### ⚠ Produced here, consumed nowhere
+>
+> **Nothing in the campaign path reads `overrides/` or `packages/`.** Verified by grep:
+> neither `build-package.sh` nor `rdistroctl.py` nor `rdistro_repo.py` references either
+> directory. `rdistroctl run` still fetches pinned Debian sources unmodified, so a saved
+> override has **no effect on a campaign build**.
+>
+> Patches can be authored, stored, and built one at a time through `source-shell`. They
+> are not yet carried through a campaign. The wiring is small — `build-package.sh` already
+> has a `PRE_BUILD_COMMAND` hook at exactly the point where an override series would be
+> applied — but it does not exist yet, and until it does, the only way to build with a
+> patch applied is `source-shell`.
+
+Native packages do not go through this stage at all — they are built directly from
+`packages/<src>/`. See the
+[native package walkthrough](native-package-walkthrough.md).
+
+---
+
+## Stage 10 — The installer image
+
+### `image/`
+
+**MANUAL. No ISO has been produced yet.** This is the composition input, committed
+because the configuration is the reviewable part; the output is a large binary
+reproducible from it.
+
+| File | Meaning |
+|---|---|
+| `image/Dockerfile` | Layers `simple-cdd`, `debian-cd`, `xorriso`, `reprepro` onto `rdistro-buildroot:2026-08-13` |
+| `image/simple-cdd/simple-cdd.conf` | arm64, one profile, `MAXCDS=1`, mirror pinned to `20260813T165000Z` |
+| `image/simple-cdd/profiles/rdistro-minimal.packages` | `rdistro-minimal` plus kernel, initramfs and GRUB EFI |
+| `image/simple-cdd/profiles/rdistro-minimal.preseed` | Points the installer's mirror at the **same pinned snapshot** |
+| `image/simple-cdd/profiles/rdistro-minimal.postinst.in` | Writes `/etc/apt/sources.list.d/rdistro.sources` and `/etc/rdistro-image` |
+
+The pin propagates deliberately. A machine installed from this media resolves its
+packages from the same frozen archive the packages were built against — an image that
+pinned its build inputs but installed from current testing would defeat the whole
+arrangement.
+
+**Input — MANUAL:** `manifests/debian-installer-arm64.txt` records the debian-installer
+daily build (`20260812-01:21`), its `SHA256SUMS` digest, the snapshot it pairs with, and
+the kernel udeb version. The installer is a **downloaded binary component**, not something
+built here, so it needs a recorded identity for the image to be reproducible at all. The
+digest is of the checksum file rather than of each udeb, which pins the set while keeping
+the manifest small.
+
+`@RDISTRO_REPO_URL@` and `@RDISTRO_REPO_SUITE@` in the postinst template are placeholders;
+nothing substitutes them yet.
+
+---
+
 ## From-scratch runbook
 
 In dependency order. Steps marked **manual** have no script.
@@ -612,6 +763,27 @@ scripts/rdistro_repo.py promote  --release gen3-canary
 scripts/rdistroctl.py run --campaign gen3-bootstrap --parallel 4
 ```
 
+Two paths branch off this sequence rather than continuing it.
+
+**Local changes to a source** — authoring only; see the caveat in
+[Stage 9](#stage-9--the-source-workspace):
+
+```sh
+scripts/rdistroctl.py source-edit   <src>   # work/edit/<src>, git-backed
+# ... edit, commit as you like ...
+scripts/rdistroctl.py source-status <src>
+scripts/rdistroctl.py source-save   <src>   # overrides/<src>/patches/
+scripts/rdistroctl.py source-shell  <src>   # build it — the only path that applies it
+```
+
+**Native packages** — full round trip in the
+[native package walkthrough](native-package-walkthrough.md):
+
+```sh
+scripts/rdistroctl.py package-new <src>     # packages/<src>/
+scripts/rdistroctl.py source-origin <src>   # -> native
+```
+
 ---
 
 ## Stranded artifacts
@@ -619,6 +791,10 @@ scripts/rdistroctl.py run --campaign gen3-bootstrap --parallel 4
 Twenty categories of file exist in this tree that **no current script produces**. Each is
 listed with what made it, why it is stranded, and what happens if you run the nearest
 equivalent today.
+
+Entry 21 is the mirror image and is included here for the same reason: an artifact this
+tree *produces* that no current script **consumes**. A file nothing reads is as much a
+break in the chain as a file nothing writes.
 
 ### 1. `analysis/bootstrap/full/`
 
@@ -747,6 +923,28 @@ of a directory listing, not an input to anything.
 macOS Finder metadata, present at the repository root and in `manifests/`, `repo/`,
 `analysis/`, `analysis/bootstrap/`, and `work/campaigns/gen3-bootstrap/`.
 
+### 21. `overrides/` and `packages/` — produced, but not consumed
+
+The inverse of stranded, and worth the same explicitness. `rdistroctl source-save` writes
+patch series to `overrides/<src>/patches/`, and `package-new` scaffolds native sources
+under `packages/<src>/`. **Nothing in the campaign path reads either directory** — grep
+finds no reference to `overrides` or `packages` in `build-package.sh`, `rdistroctl.py` or
+`rdistro_repo.py`.
+
+The practical consequence: saving an override and then running `rdistroctl run` builds
+the **unmodified** pinned Debian source, succeeds, and reports nothing unusual. The patch
+is silently absent from the result. Today the only way to build with an override applied
+is `source-shell`, one source at a time.
+
+Native packages under `packages/` are reachable, but only through the manual path in the
+[native package walkthrough](native-package-walkthrough.md) — no campaign builds them
+either.
+
+The fix is small and known: `build-package.sh` already runs `PRE_BUILD_COMMAND` in the
+source tree after `apt-get source` and before the build, which is exactly where an
+override series would be applied. Until that lookup exists, treat `overrides/` as an
+authoring format rather than as something the pipeline honours.
+
 ---
 
 ## Appendix A — Controller database schema
@@ -837,7 +1035,7 @@ promoted, so that hash no longer resolves.
 
 ## Current state
 
-A point-in-time snapshot, read from `work/control/rdistro.db` on 2026-08-24. These
+A point-in-time snapshot, read from `work/control/rdistro.db` on 2026-08-28. These
 numbers drift as the campaign advances.
 
 | Release | Status | Sources | Artifacts |
@@ -846,22 +1044,32 @@ numbers drift as the campaign advances.
 
 | Campaign `gen3-bootstrap` (generation 3, 4725 sources) | Count |
 |---|---|
-| SUCCEEDED | 1910 |
-| PENDING | 2552 |
-| RETRY | 188 |
-| FAILED | 71 |
-| BUILDING | 4 |
-| Attempts recorded | 2189 |
+| SUCCEEDED | 2732 |
+| PENDING | 1931 |
+| FAILED | 55 |
+| BUILDING | 7 |
+| Attempts recorded | 3066 |
 
-Of the 71 current failures, 61 are `source-fetch` (transient `snapshot.debian.org`
-errors, requeued by `retry-fetch-failures.py`), 7 are `tests`, and 3 are `compile`.
+The 55 current failures break down as 19 `docs`, 16 `compile`, 12 `source-fetch`,
+5 `unknown`, 2 `configure` and 1 `tests`.
+
+That `docs` is the largest category is the result of narrowing the classifier rather than
+a change in what fails: these were previously scattered across `unknown` and an
+over-broad `source-fetch`. They are packages whose `debian/install` references
+documentation that `nodoc` prevented from being generated, which is what
+`config/package-policy/nodoc-incompatible.txt` exists to fix — so the list is expected to
+grow and this category to shrink.
 
 | Directory | Size |
 |---|---|
-| `work/campaigns/` | 28 G |
-| `repo/releases/` | 9.6 G |
+| `work/campaigns/` | 40 G |
+| `repo/releases/gen3-canary/` | 9.6 G |
 | `repo/pool/` | 438 M |
 | `repo-pass1/`, `repo-pass2/` | 438 M each |
 | `analysis/` | 387 M |
 | `logs/` | 170 M |
-| Tracked source | ~470 K |
+| Tracked source | ~645 K |
+
+These do not sum to the total on disk. Release artifacts are **hardlinked** from the
+campaign attempt directories they were promoted out of, so `repo/releases/` costs almost
+nothing beyond `work/campaigns/`. Actual usage is roughly **51 GB**.
