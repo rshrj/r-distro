@@ -46,3 +46,24 @@ __pycache__/
 *.tmp
 *.swp
 *~
+
+# Debian native package build output (dpkg-buildpackage / debhelper)
+packages/*/debian/*/
+!packages/*/debian/source/
+!packages/*/debian/patches/
+packages/*/debian/files
+packages/*/debian/*.substvars
+packages/*/debian/*.debhelper.log
+packages/*/debian/debhelper-build-stamp
+
+# Installer image build output (simple-cdd / debian-cd)
+/image/images/
+/image/tmp/
+/image/out/
+*.iso
+
+# Compiled from scripts/buildactivity.swift
+/scripts/buildactivity
+
+# The archive public key belongs in the keyring package source
+!packages/rdistro-archive-keyring/keys/rdistro-archive-keyring.asc
