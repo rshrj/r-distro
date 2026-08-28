@@ -23,6 +23,7 @@ from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import rdistro_repo
+import rdistro_source
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -3019,6 +3020,7 @@ def main():
     )
 
     rdistro_repo.register_subcommands(sub)
+    rdistro_source.register_subcommands(sub)
 
     args = parser.parse_args()
 
