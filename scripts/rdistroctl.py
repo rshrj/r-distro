@@ -982,17 +982,37 @@ FAILURE_PATTERNS = [
         ),
     ),
     (
+        "network",
+        (
+            "could not resolve",
+            "temporary failure resolving",
+            "unable to connect to",
+            "connection timed out",
+            "network is unreachable",
+        ),
+    ),
+    (
         "source-fetch",
         (
-            "failed to fetch",
-            "apt-get source",
             "unable to find a source package",
+            "can not find version",
+            "can not find a package for",
+        ),
+    ),
+    (
+        "docs",
+        (
+            "dh_doxygen: error:",
+            "unable to load addon sphinxdoc",
+            "pandoc: no such file or directory",
+            "mdbook: no such file or directory",
+            "tex: command not found",
         ),
     ),
     (
         "tests",
         (
-            "dh_auto_test",
+            "dh_auto_test: error:",
             "tests failed",
             "test suite failed",
             "failures!!!",
@@ -1004,6 +1024,15 @@ FAILURE_PATTERNS = [
             "configure: error:",
             "cmake error",
             "meson.build:",
+        ),
+    ),
+    (
+        "packaging",
+        (
+            "dh_install: error:",
+            "dh_missing: error:",
+            "dh_installdocs: error:",
+            "dh_installman: error:",
         ),
     ),
     (
@@ -1043,6 +1072,28 @@ def classify_failure(log_path: Path):
 
     except Exception:
         return "unknown"
+
+    doc_paths = (
+        "/usr/share/doc/",
+        "/usr/share/man/",
+        "target/apidocs",
+        "debian/doc/html",
+    )
+
+    missing_file_errors = (
+        "no such file or directory",
+        "cannot stat",
+        "cannot access",
+        "can't read",
+        "missing files",
+    )
+
+    if (
+        any(x in text for x in doc_paths)
+        and
+        any(x in text for x in missing_file_errors)
+    ):
+        return "docs"
 
     for category, patterns in FAILURE_PATTERNS:
 
