@@ -1,3 +1,9 @@
+rdistro-minimal (0.1.1) unstable; urgency=medium
+
+  * Leave kernel selection to the installer.
+
+ -- R-Distro Project <packages@rdistro.invalid>  Sun, 20 Sep 2026 12:40:33 +0200
+
 rdistro-minimal (0.1) unstable; urgency=medium
 
   * Initial R-Distro minimal system metapackage.

@@ -10,7 +10,6 @@ Package: rdistro-minimal
 Architecture: arm64
 Depends:
  rdistro-release (>= 0.1.1),
- linux-image-arm64,
  systemd-sysv,
  apt,
  ca-certificates,
