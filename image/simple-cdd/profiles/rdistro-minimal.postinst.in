@@ -3,6 +3,14 @@ set -e
 
 mkdir -p /etc/apt/sources.list.d
 
+cat >/etc/apt/sources.list.d/debian-snapshot.sources <<'EOF'
+Types: deb
+URIs: http://snapshot.debian.org/archive/debian/20260813T165000Z/
+Suites: forky
+Components: main
+Check-Valid-Until: no
+EOF
+
 cat >/etc/apt/sources.list.d/rdistro.sources <<'APT_EOF'
 Types: deb
 URIs: @RDISTRO_REPO_URL@
